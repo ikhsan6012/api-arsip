@@ -23,10 +23,11 @@ const userSchema = new Schema({
 		required: true,
 		default: 1
 	},
+	token: String,
 	transaksi: [{
 		type: Schema.Types.ObjectId,
 		ref: 'Transaksi'
-	}]
+	}],
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
 
 module.exports = mongoose.model('User', userSchema)

@@ -2,6 +2,7 @@ module.exports = `
     type LB {
         _id: ID!
         npwp: String
+        nama_wp: String
         no_tt: String
         tgl_spt: String
         nilai: String
@@ -11,5 +12,17 @@ module.exports = `
         pb: String
         tgl_terima: String
         tgl_jt: String
+        no_nd: Int
+        tahun_nd: Int
+    }
+
+    input SortLB {
+        sortBy: String!
+        order: Int!
+    }
+
+    input FilterLB {
+        filterBy: String!
+        value: String
     }
 `
