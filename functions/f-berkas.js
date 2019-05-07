@@ -210,6 +210,7 @@ const editBerkas = (id, update) => {
 				}
 				set = pemilik ? await { ...set, pemilik: pemilik.id } : set
 				set = penerima ? await { ...set, penerima: penerima.id } : set
+				set = await { ...set, masa_pajak: update.masa_pajak, tahun_pajak: update.tahun_pajak, ket_lain: update.ket_lain }
 				res.set(set)
 				res.save()
 				let data = { ...res._doc, lokasi, ket_berkas }

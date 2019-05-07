@@ -69,6 +69,7 @@ module.exports = `
 		gudang: Int
 		kd_lokasi: String
 		npwp: String
+		status: String
 		nama_wp: String
 		kd_berkas: String
 		masa_pajak: Int
