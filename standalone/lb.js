@@ -7,15 +7,21 @@ mongoose.connect('mongodb://localhost:27017/arsip', {
 	useCreateIndex: true 
 })
 	.then(() => {
-		return LBModel.find({}, 'tgl_terima')
+		return LBModel.find({}, 'npwp tgl_terima')
 	})
 	.then(async res => {
 		const lb = []
 		await res.forEach(d => {
+			const npwp1 = d.npwp.split('-')[0]
+			const npwp2 = d.npwp.split('-').filter((n, i) => i > 0).join('.')
+			const npwp = `${npwp1}-${npwp2}`
 			const l = {
 				updateOne: {
 					filter: { _id: d._id },
-					update: { time_tgl_terima: new Date(d.tgl_terima.split('/').reverse().join('-')).getTime() }
+					update: { 
+						npwp,
+						time_tgl_terima: new Date(d.tgl_terima.split('/').reverse().join('-')).getTime()
+					}
 				}
 			}
 			lb.push(l)
