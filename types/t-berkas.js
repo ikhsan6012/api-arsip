@@ -37,6 +37,7 @@ module.exports = `
 		tgl_terima: String!
 		urutan: Float!
 		ket_lain: String
+		status: String
 	}
 
 	input BerkasPBK {
@@ -63,6 +64,7 @@ module.exports = `
 		kd_lokasi: String!
 		urutan: Float!
 		ket_lain: String
+		status: String
 	}
 
 	input BerkasUpdate {
