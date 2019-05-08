@@ -58,8 +58,8 @@ module.exports = `
 		kd_berkas: String!
 		npwp: String!
 		nama_wp: String!
-		masa_pajak: Int!
-		tahun_pajak: Int!
+		masa_pajak: Int
+		tahun_pajak: Int
 		gudang: Int!
 		kd_lokasi: String!
 		urutan: Float!
