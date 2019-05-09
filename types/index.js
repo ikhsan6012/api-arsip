@@ -36,7 +36,7 @@ module.exports = `
 		addBerkasLainLain(input: BerkasLainLain!): Berkas!
 		editBerkas(id: ID!, update: BerkasUpdate!): Berkas!
 		deleteBerkas(id: ID!): Berkas!
-		addNDLB(id: ID!, value: Int!, tahun: Int!): LB!
+		addNDLB(id: ID!, value: String!, tahun: Int!): LB!
 		deleteNDLB(id: ID!): LB!
 	}
 
