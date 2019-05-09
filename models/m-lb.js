@@ -3,6 +3,7 @@ const Schema = mongoose.Schema
 
 const lbSchema = new Schema({
     npwp: String,
+    nama_wp: String,
     no_tt: String,
     tgl_spt:String,
     time_tgl_spt: Number,

@@ -12,13 +12,8 @@ const getSPTLB = ({ pageSize, page, sorted = [], filtered = [] }) => {
     })
     return new Promise((resolve, reject) => {
         return LBModel.find(filter).sort({ ...sort, time_tgl_terima: -1 }).skip(skip).limit(pageSize)
-            .then(async res => {
-                let data = await res.map(async lb => {
-                    const wp = await WPModel.findOne({ npwp: lb.npwp }, 'nama_wp')
-                    return { ...lb._doc, nama_wp: wp.nama_wp }
-                })
-                data = await Promise.all(data)
-                resolve(data)
+            .then(res => {
+                resolve(res)
             })
             .catch(err => reject(err))
     })
