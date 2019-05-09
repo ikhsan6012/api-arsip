@@ -15,7 +15,7 @@ const lbSchema = new Schema({
     tgl_terima: String,
     time_tgl_terima: Number,
     tgl_jt: String,
-    no_nd: Number,
+    no_nd: String,
     tahun_nd: Number,
 })
 

@@ -12,7 +12,7 @@ module.exports = `
         pb: String
         tgl_terima: String
         tgl_jt: String
-        no_nd: Int
+        no_nd: String
         tahun_nd: Int
     }
 
