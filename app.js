@@ -6,9 +6,7 @@ const { buildSchema } = require('graphql')
 const mongoose = require('mongoose')
 const fileUpload = require('express-fileupload')
 const fs = require('fs')
-const request = require('request')
-const proxy = require('http-proxy').createProxyServer({})
-
+const LBModel = require('./models/m-lb')
 const app = express()
 
 // Resolver
@@ -52,6 +50,28 @@ app.post('/upload', (req, res) => {
 	const filename = new Date().toISOString() + '_' + npwp + '.' + mime
 	fs.writeFileSync(`./uploads/${filename}`, req.files.file.data)
 	res.status(200).json({ file: filename })
+})
+
+// Import LB
+app.post('/importlb', (req, res) => {
+	const file = req.files.file
+	const lb = JSON.parse(Buffer.from(file.data).toString())
+	const update = lb.map(l => {
+		const npwp1 = l.npwp.split('-')[0]
+		const npwp2 = l.npwp.split('-').filter((n, i) => i > 0).join('.')
+		const npwp = `${npwp1}-${npwp2}`
+		return {
+			updateOne: {
+				filter: { no_tt: l.no_tt },
+				update: { ...l, npwp },
+				upsert: true
+			}
+		}
+	})
+	LBModel.bulkWrite(update)
+		.then(() => {
+			res.json(file)
+		})
 })
 
 // Connect to MongoDB
