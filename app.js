@@ -7,6 +7,9 @@ const mongoose = require('mongoose')
 const fileUpload = require('express-fileupload')
 const fs = require('fs')
 const LBModel = require('./models/m-lb')
+const { verifyToken } = require('./middleware/check-auth')
+
+require('dotenv').config()
 const app = express()
 
 // Resolver
@@ -23,10 +26,10 @@ app.use(cors())
 app.use(fileUpload())
 
 // GraphQL Middleware
-app.use('/graphql', graphqlHTTP({
+app.use('/graphql', verifyToken, graphqlHTTP({
 	schema,
 	rootValue,
-	graphiql: true
+	graphiql: true,
 }))
 
 // Get Lampiran
