@@ -16,7 +16,7 @@ type RootQuery{
 	wps(npwp: String, nama_wp: String): [WP]
 	totalWPs(npwp: String, nama_wp: String, status: String): Int
 	lastUpdateWPs: String
-	berkases(by: BerkasBy!, gudang: Int, kd_lokasi: String): [Berkas]
+	berkases(by: BerkasBy!, gudang: Int, kd_lokasi: String, id: ID): [Berkas]
 	lastUpdateBerkas(kd_berkas: String!): String
 	penerimas(nama_penerima: String, tgl_terima: String): [Penerima]
 }

@@ -19,5 +19,6 @@ module.exports = `
 
 	enum BerkasBy {
 		lokasi
+		pemilik
 	}
 `

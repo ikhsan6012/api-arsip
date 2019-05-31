@@ -5,14 +5,24 @@ const PenerimaModel = require('../models/m-penerima')
 const KetBerkasModel = require('../models/m-ket-berkas')
 
 const berkases = root => {
+	let getBerkas
 	if(root.by.match(/lokasi/i)) {
-		delete root.by
-		return berkasesByLokasi(root)
+		getBerkas = berkasesByLokasi
 	}
+	if(root.by.match(/pemilik/i)) {
+		getBerkas = berkasesByPemilik
+	}
+	delete root.by
+	return getBerkas(root)
+		.catch(err => {
+			let error
+			err.error ? error = err.error : null
+			throw Error(error || 'Terjadi Masalah Pada Server...')
+		})
 }
 
 const berkasesByLokasi = root => {
-	if(!root.gudang || !root.kd_lokasi) throw Error('Gudang dan Kd Lokasi Diperlukan...')
+	if(!root.gudang || !root.kd_lokasi) throw { error: 'Gudang dan Kd Lokasi Diperlukan...' }
 	root.kd_lokasi = new RegExp(root.kd_lokasi, 'i')
 	return LokasiModel.findOne(root, 'berkas')
 		.populate({
@@ -39,9 +49,29 @@ const berkasesByLokasi = root => {
 			if(!res) return []
 			return res.berkas
 		})
-		.catch(err => {
-			console.log(err)
-			throw Error('Terjadi Masalah Pada Server...')
+}
+
+const berkasesByPemilik = root => {
+	if(!root.id) throw { error: 'ID Wajib Pajak Diperlukan...' }
+	return WPModel.findById(root.id, 'berkas')
+		.populate({
+			path: 'berkas',
+			populate: [
+				{
+					path: 'ket_berkas',
+					model: 'KetBerkas',
+					select: 'kd_berkas nama_berkas'
+				},
+				{
+					path: 'lokasi',
+					model: 'Lokasi',
+					select: 'gudang kd_lokasi'
+				}
+			]
+		})
+		.then(res => {
+			if(!res) return []
+			return res.berkas
 		})
 }
 
