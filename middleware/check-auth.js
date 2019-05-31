@@ -4,7 +4,6 @@ module.exports = {
 	verifyToken: (req, res, next) => {
 		const token = req.headers.authorization ? req.headers.authorization.split(' ')[1] : null
 		!token ? next() : null
-		console.log(token)
 		const data = jwt.verify(token, process.env.SECRET_KEY)
 		const newToken = jwt.sign({
 			_id: data._id,
@@ -30,7 +29,8 @@ module.exports = {
 			verify()
 		}catch(err){
 			return res.status(401).json({ errors: {
-				message: 'Session Telah Berakhir!, Silahkan Login Kembali...' 
+				name: 'SessionError',
+				message: 'Session Telah Berakhir!' 
 			}})
 		}
 		const newToken = jwt.sign({

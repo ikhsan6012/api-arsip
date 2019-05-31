@@ -1,6 +1,7 @@
 module.exports = `
 ${require('./t-user2')}
 ${require('./t-ket-berkas2')}
+${require('./t-wp2')}
 
 type RootQuery{
 	users(nama: String, status: Int): [User]
@@ -9,6 +10,7 @@ type RootQuery{
 	ketBerkases(nama_berkas: String): [KetBerkas]
 	ketBerkas(kd_berkas: String!): KetBerkas
 	totalKetBerkases(nama_berkas: String): Int
+	wps(npwp: String, nama_wp: String): [WP]
 	totalWPs(npwp: String, nama_wp: String, status: String): Int
 	lastUpdateWPs: String
 	lastUpdateBerkas(kd_berkas: String!): String

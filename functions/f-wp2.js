@@ -1,5 +1,16 @@
 const WPModel = require('../models/m-wp')
 
+const wps = root => {
+	if(!root.npwp && !root.nama_wp) throw Error('NPWP atau Nama WP Diperlukan...')
+	root.nama_wp ? root.nama_wp = new RegExp(root.nama_wp, 'i') : null
+	root.npwp ? root.npwp = new RegExp(root.npwp, 'i') : null
+	return WPModel.find(root, '-berkas')
+		.catch(err => {
+			console.log(err)
+			throw Error('Terjadi Masalah Pada Server...')
+		})
+}
+
 const totalWPs = root => {
 	root.nama_wp ? root.nama_wp = new RegExp(root.nama_wp, 'i') : null
 	root.status ? root.status = new RegExp(root.status, 'i') : null
@@ -21,4 +32,4 @@ const lastUpdateWPs = () => {
 		})
 }
 
-module.exports = { totalWPs, lastUpdateWPs }
+module.exports = { wps, totalWPs, lastUpdateWPs }

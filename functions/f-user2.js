@@ -17,7 +17,7 @@ const user = ({ username, password }) => {
 			if(!res) return res
 			const match = bcrypt.compareSync(password, res.password)
 			if(!match) return null
-			const token = jwt.sign({ _id: res.id, nama: res.nama, username: res.username }, process.env.SECRET_KEY, { expiresIn: '1h' })
+			const token = jwt.sign({ _id: res.id, nama: res.nama, username: res.username, status: res.status }, process.env.SECRET_KEY, { expiresIn: '1h' })
 			res.token = token
 			return res
 		})

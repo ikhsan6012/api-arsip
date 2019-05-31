@@ -1,6 +1,15 @@
-const { totalWPs, lastUpdateWPs } = require('../functions/f-wp2')
+const { wps, totalWPs, lastUpdateWPs } = require('../functions/f-wp2')
 
 module.exports = {
+	wps: (root, args) => {
+		return wps(root)
+			.then(res => {
+				return res
+			})
+			.catch(err => {
+				throw err
+			})
+	},
 	totalWPs: (root, args) => {
 		return totalWPs(root)
 			.then(res => {
