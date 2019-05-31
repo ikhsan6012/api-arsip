@@ -12,6 +12,9 @@ const berkases = root => {
 	if(root.by.match(/pemilik/i)) {
 		getBerkas = berkasesByPemilik
 	}
+	if(root.by.match(/penerima/i)) {
+		getBerkas = berkasesByPenerima
+	}
 	delete root.by
 	return getBerkas(root)
 		.catch(err => {
@@ -75,6 +78,31 @@ const berkasesByPemilik = root => {
 		})
 }
 
+const berkasesByPenerima = root => {
+	if(!root.id) throw { error: 'ID Penerima Diperlukan...' }
+	root.nama_penerima ? root.nama_penerima = new RegExp(root.nama_penerima, 'i') : null
+	return PenerimaModel.findById(root.id, 'berkas')
+		.populate({
+			path: 'berkas',
+			populate: [
+				{
+					path: 'ket_berkas',
+					model: 'KetBerkas',
+					select: 'kd_berkas nama_berkas'
+				},
+				{
+					path: 'lokasi',
+					model: 'Lokasi',
+					select: 'gudang kd_lokasi'
+				}
+			]
+		})
+		.then(res => {
+			if(!res) return []
+			return res.berkas
+		})
+}
+
 const deleteBerkas = root => {
 	return BerkasModel.findByIdAndDelete(root.id)
 		.populate('pemilik', '_id')
@@ -93,7 +121,6 @@ const deleteBerkas = root => {
 			}
 		})
 		.catch(err => {
-			console.log(err)
 			throw Error('Terjadi Masalah Pada Server...')
 		})
 }
