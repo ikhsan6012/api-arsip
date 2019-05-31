@@ -1,10 +1,17 @@
 const KetBerkasModel = require('../models/m-ket-berkas')
 
 const ketBerkases = root => {
+	let projection = ''
 	root.nama_berkas ? root.nama_berkas = new RegExp(root.nama_berkas, 'i') : null
-	return KetBerkasModel.find(root)
+	if(root.projection){
+		projection = root.projection
+		delete root.projection
+	}
+	return KetBerkasModel.find(root, projection)
 		.then(res => {
-			res = res.map(kb => ({ ...kb._doc, jumlah: kb.berkas.length }))
+			if(res.berkas){
+				res = res.map(kb => ({ ...kb._doc, jumlah: kb.berkas.length }))
+			}
 			return res
 		})
 		.catch(err => {

@@ -1,9 +1,9 @@
 module.exports = `
 	type KetBerkas{
-		_id: ID!
-		kd_berkas: String!
-		nama_berkas: String!
-		jumlah: Int!
+		_id: ID
+		kd_berkas: String
+		nama_berkas: String
+		jumlah: Int
 		berkas_baru: Int
 		berkas_lama: Int
 		wajib_pajak_pindah: Int
