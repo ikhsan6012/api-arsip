@@ -13,7 +13,7 @@ type RootQuery{
 	ketBerkases(nama_berkas: String, projection: String): [KetBerkas]
 	ketBerkas(kd_berkas: String!): KetBerkas
 	totalKetBerkases(nama_berkas: String): Int
-	wps(npwp: String, nama_wp: String): [WP]
+	wps(by: WPSBy!, search: WPSSearch!, begin: Int, end: Int): [WP]
 	wp(npwp: String): WP
 	totalWPs(npwp: String, nama_wp: String, status: String): Int
 	lastUpdateWPs: String
