@@ -9,9 +9,7 @@ const ketBerkases = root => {
 	}
 	return KetBerkasModel.find(root, projection)
 		.then(res => {
-			if(res.berkas){
-				res = res.map(kb => ({ ...kb._doc, jumlah: kb.berkas.length }))
-			}
+			res = res.map(kb => (kb.berkas ? { ...kb._doc, jumlah: kb.berkas.length } : kb))
 			return res
 		})
 		.catch(err => {

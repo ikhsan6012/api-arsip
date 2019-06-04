@@ -24,6 +24,52 @@ const berkases = root => {
 		})
 }
 
+const deleteBerkas = root => {
+	return BerkasModel.findByIdAndDelete(root.id)
+		.populate('pemilik', '_id')
+		.populate('penerima', '_id')
+		.then(async res => {
+			const berkasToPull = { berkas: res.id }
+			try {
+				const KetBerkas = await KetBerkasModel.findOne(berkasToPull)
+				const Lokasi = await LokasiModel.findOne(berkasToPull)
+				const Pemilik = await WPModel.findOne(berkasToPull)
+				const Penerima = await PenerimaModel.findOne(berkasToPull)
+				pullBerkas([KetBerkas, Lokasi, Pemilik, Penerima], res.id)
+				return res
+			} catch (err) {
+				throw err
+			}
+		})
+		.catch(err => {
+			throw Error('Terjadi Masalah Pada Server...')
+		})
+}
+
+const editBerkas = async root => {
+	const input = root.input
+	try {
+		if(!input.kd_berkas) throw { msg: 'Kd Berkas Diperlukan...' }
+		if(!input.lokasi.gudang || !input.lokasi.kd_lokasi) throw { msg: 'Gudang dan Kd Lokasi Diperlukan...' }
+		const ket_berkas = await KetBerkasModel.findOne({ kd_berkas: new RegExp(input.kd_berkas, 'i') }, '_id')
+		const lokasi = await LokasiModel.findOneAndUpdate(input.lokasi, input.lokasi, {
+			upsert: true, new: true
+		}).select('_id')
+		const pemilik = input.pemilik ? await WPModel.findOneAndUpdate({ npwp: input.pemilik.npwp }, input.pemilik, {
+			upsert: true, new: true
+		}).select('_id') : null
+		const penerima = input.penerima ? await PenerimaModel.findOneAndUpdate(input.penerima, input.penerima, {
+			upsert: true, new: true
+		}).select('_id') : null
+		delete input.kd_berkas
+		return BerkasModel.findByIdAndUpdate(root.id, { ...input, ket_berkas, lokasi, pemilik, penerima }, { new: true })
+	} catch (err) {
+		console.log(err)
+		err = err.msg ? err.msg : 'Terjadi Masalah Saat Menyimpan Data...'
+		throw Error(err)
+	}
+}
+
 const berkasesByLokasi = root => {
 	if(!root.gudang || !root.kd_lokasi) throw { error: 'Gudang dan Kd Lokasi Diperlukan...' }
 	root.kd_lokasi = new RegExp(root.kd_lokasi, 'i')
@@ -35,6 +81,11 @@ const berkasesByLokasi = root => {
 					path: 'ket_berkas',
 					model: 'KetBerkas',
 					select: 'kd_berkas nama_berkas'
+				},
+				{
+					path: 'lokasi',
+					model: 'Lokasi',
+					select: 'gudang kd_lokasi'
 				},
 				{
 					path: 'pemilik',
@@ -69,6 +120,11 @@ const berkasesByPemilik = root => {
 					path: 'lokasi',
 					model: 'Lokasi',
 					select: 'gudang kd_lokasi'
+				},
+				{
+					path: 'pemilik',
+					model: 'WP',
+					select: 'npwp nama_wp'
 				}
 			]
 		})
@@ -103,28 +159,6 @@ const berkasesByPenerima = root => {
 		})
 }
 
-const deleteBerkas = root => {
-	return BerkasModel.findByIdAndDelete(root.id)
-		.populate('pemilik', '_id')
-		.populate('penerima', '_id')
-		.then(async res => {
-			const berkasToPull = { berkas: res.id }
-			try {
-				const KetBerkas = await KetBerkasModel.findOne(berkasToPull)
-				const Lokasi = await LokasiModel.findOne(berkasToPull)
-				const Pemilik = await WPModel.findOne(berkasToPull)
-				const Penerima = await PenerimaModel.findOne(berkasToPull)
-				pullBerkas([KetBerkas, Lokasi, Pemilik, Penerima], res.id)
-				return res
-			} catch (err) {
-				throw err
-			}
-		})
-		.catch(err => {
-			throw Error('Terjadi Masalah Pada Server...')
-		})
-}
-
 const pullBerkas = (array, id) => {
 	array.forEach(each => {
 		if(each){
@@ -134,4 +168,4 @@ const pullBerkas = (array, id) => {
 	})
 }
 
-module.exports = { berkases, deleteBerkas }
+module.exports = { berkases, deleteBerkas, editBerkas }

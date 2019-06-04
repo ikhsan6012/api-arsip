@@ -5,4 +5,9 @@ module.exports = `
 		kd_lokasi: String
 		berkas: [Berkas]
 	}
+
+	input LokasiInput {
+		gudang: Int!
+		kd_lokasi: String!
+	}
 `

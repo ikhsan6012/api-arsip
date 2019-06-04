@@ -11,6 +11,15 @@ const wps = root => {
 		})
 }
 
+const wp = root => {
+	if(!root.npwp) throw Error('NPWP 15 Digit Diperlukan...')
+	return WPModel.findOne(root, '-berkas')
+		.catch(err => {
+			console.log(err)
+			throw Error('Terjadi Masalah Pada Server...')
+		})
+}
+
 const totalWPs = root => {
 	root.nama_wp ? root.nama_wp = new RegExp(root.nama_wp, 'i') : null
 	root.status ? root.status = new RegExp(root.status, 'i') : null
@@ -32,4 +41,4 @@ const lastUpdateWPs = () => {
 		})
 }
 
-module.exports = { wps, totalWPs, lastUpdateWPs }
+module.exports = { wps, wp, totalWPs, lastUpdateWPs }

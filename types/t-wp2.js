@@ -5,4 +5,10 @@ module.exports = `
 		nama_wp: String
 		status: String
 	}
+
+	input WPInput {
+		npwp: String!
+		nama_wp: String!
+		status: String
+	}
 `

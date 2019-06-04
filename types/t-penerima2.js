@@ -5,4 +5,9 @@ module.exports = `
 		tgl_terima: String
 		berkas: [Berkas]
 	}
+
+	input PenerimaInput {
+		nama_penerima: String!
+		tgl_terima: String!
+	}
 `

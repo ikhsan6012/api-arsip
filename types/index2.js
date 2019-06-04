@@ -14,6 +14,7 @@ type RootQuery{
 	ketBerkas(kd_berkas: String!): KetBerkas
 	totalKetBerkases(nama_berkas: String): Int
 	wps(npwp: String, nama_wp: String): [WP]
+	wp(npwp: String): WP
 	totalWPs(npwp: String, nama_wp: String, status: String): Int
 	lastUpdateWPs: String
 	berkases(by: BerkasBy!, gudang: Int, kd_lokasi: String, id: ID): [Berkas]
@@ -24,6 +25,7 @@ type RootQuery{
 type RootMutation{
 	addUser(input: UserInput!): User
 	deleteBerkas(id: ID!): Berkas
+	editBerkas(id: ID!, input: BerkasEdit!): Berkas
 }
 
 schema {
