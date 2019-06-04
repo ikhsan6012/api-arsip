@@ -150,6 +150,11 @@ const berkasesByPenerima = root => {
 					path: 'lokasi',
 					model: 'Lokasi',
 					select: 'gudang kd_lokasi'
+				},
+				{
+					path: 'penerima',
+					model: 'Penerima',
+					select: 'nama_penerima tgl_terima'
 				}
 			]
 		})
