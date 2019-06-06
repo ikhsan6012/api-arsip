@@ -24,8 +24,9 @@ type RootQuery{
 
 type RootMutation{
 	addUser(input: UserInput!): User
+	addBerkas(input: BerkasInput!): Berkas
 	deleteBerkas(id: ID!): Berkas
-	editBerkas(id: ID!, input: BerkasEdit!): Berkas
+	editBerkas(id: ID!, input: BerkasInput!): Berkas
 }
 
 schema {

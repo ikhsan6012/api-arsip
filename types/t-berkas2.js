@@ -17,7 +17,7 @@ module.exports = `
 		updated_at: String
 	}
 
-	input BerkasEdit {
+	input BerkasInput {
 		lokasi: LokasiInput!
 		pemilik: WPInput
 		kd_berkas: String!
