@@ -25,6 +25,7 @@ type RootQuery{
 type RootMutation{
 	addUser(input: UserInput!): User
 	addBerkas(input: BerkasInput!): Berkas
+	addBerkasDocument(id: ID!, file: String!): Berkas
 	deleteBerkas(id: ID!): Berkas
 	editBerkas(id: ID!, input: BerkasInput!): Berkas
 }

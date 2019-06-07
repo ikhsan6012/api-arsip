@@ -28,6 +28,7 @@ module.exports = `
 		nomor_pbk: Int
 		tahun_pbk: Int
 		urutan: Float!
+		file: String
 		ket_lain: String
 	}
 

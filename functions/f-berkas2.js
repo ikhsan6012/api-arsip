@@ -69,6 +69,14 @@ const addBerkas = async root => {
 	}
 }
 
+const addBerkasDocument = ({ id, file }) => {
+	return BerkasModel.findByIdAndUpdate(id, { file }, { new: true }).select('_id')
+		.catch(err => {
+			console.log(err)
+			throw Error('Terjadi Masalah Pada Server...')
+		})
+}
+
 const deleteBerkas = root => {
 	return BerkasModel.findByIdAndDelete(root.id)
 		.populate([
@@ -113,7 +121,7 @@ const editBerkas = async root => {
 			lokasi: lokasi.id, 
 			pemilik: pemilik ? pemilik.id : null, 
 			penerima: penerima ? penerima.id : null
-		}, { new: true })
+		}, { new: true }).select('_id')
 	} catch (err) {
 		console.log(err)
 		throw Error('Terjadi Masalah Saat Menyimpan Data...')
@@ -214,22 +222,4 @@ const berkasesByPenerima = root => {
 		})
 }
 
-const pushBerkas = (array, id) => {
-	array.forEach(each => {
-		if(each.berkas){
-			each.berkas.push(id)
-			each.save()
-		}
-	})
-}
-
-const pullBerkas = (array, id) => {
-	array.forEach(each => {
-		if(each.berkas){
-			each.berkas.pull(id)
-			each.save()
-		}
-	})
-}
-
-module.exports = { berkases, addBerkas, deleteBerkas, editBerkas }
+module.exports = { berkases, addBerkas, addBerkasDocument, deleteBerkas, editBerkas }

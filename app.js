@@ -7,7 +7,7 @@ const mongoose = require('mongoose')
 const fileUpload = require('express-fileupload')
 const fs = require('fs')
 const LBModel = require('./models/m-lb')
-const { verifyToken, verifyToken2 } = require('./middleware/check-auth')
+const { verifyToken2 } = require('./middleware/check-auth')
 
 require('dotenv').config()
 const app = express()
@@ -64,9 +64,12 @@ app.get('/lampiran/:link', (req, res) => {
 app.post('/upload', (req, res) => {
 	const file = req.files.file
 	const npwp = req.body.npwp.replace(/[-.]/g, '')
+	const kd_berkas = req.body.kd_berkas
 	const mime = file.name.split('.')[1]
-	const filename = new Date().toISOString() + '_' + npwp + '.' + mime
-	fs.writeFileSync(`./uploads/${filename}`, req.files.file.data)
+	const filename = npwp 
+		? kd_berkas + '_' + npwp + '_' + new Date().toISOString() + '.' + mime
+		: kd_berkas + '_' + new Date().toISOString() + '.' + mime
+	fs.writeFileSync(`./uploads/${filename}`, file.data)
 	res.status(200).json({ file: filename })
 })
 
