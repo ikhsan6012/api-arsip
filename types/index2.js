@@ -27,7 +27,9 @@ type RootMutation{
 	addBerkas(input: BerkasInput!): Berkas
 	addBerkasDocument(id: ID!, file: String!): Berkas
 	deleteBerkas(id: ID!): Berkas
+	deleteBerkasDocument(file: String!): Berkas
 	editBerkas(id: ID!, input: BerkasInput!): Berkas
+	editBerkasDocument(id: ID!, file: String!): Berkas
 }
 
 schema {

@@ -1,4 +1,4 @@
-const { berkases, addBerkas, addBerkasDocument, deleteBerkas, editBerkas } = require('../functions/f-berkas2')
+const { berkases, addBerkas, addBerkasDocument, deleteBerkas, deleteBerkasDocument, editBerkas, editBerkasDocument } = require('../functions/f-berkas2')
 
 module.exports = {
 	berkases: (root, args) => {
@@ -41,6 +41,16 @@ module.exports = {
 				throw err
 			})
 	},
+	deleteBerkasDocument: (root, args) => {
+		return deleteBerkasDocument(root)
+			.then(res => {
+				return res
+			})
+			.catch(err => {
+				console.log(err)
+				throw err
+			})
+	},
 	editBerkas: (root, args) => {
 		return editBerkas(root)
 			.then(res => {
@@ -50,5 +60,15 @@ module.exports = {
 				console.log(err)
 				throw err
 			})
-	}
+	},
+	editBerkasDocument: (root, args) => {
+		return editBerkasDocument(root)
+			.then(res => {
+				return res
+			})
+			.catch(err => {
+				console.log(err)
+				throw err
+			})
+	},
 }

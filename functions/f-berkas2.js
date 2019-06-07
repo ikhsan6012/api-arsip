@@ -1,3 +1,6 @@
+const fs = require('fs')
+const path = require('path')
+
 const BerkasModel = require('../models/m-berkas')
 const LokasiModel = require('../models/m-lokasi')
 const WPModel = require('../models/m-wp')
@@ -69,8 +72,8 @@ const addBerkas = async root => {
 	}
 }
 
-const addBerkasDocument = ({ id, file }) => {
-	return BerkasModel.findByIdAndUpdate(id, { file }, { new: true })
+const addBerkasDocument = root => {
+	return BerkasModel.findByIdAndUpdate(root.id, { file: root.file }, { new: true })
 		.catch(err => {
 			console.log(err)
 			throw Error('Terjadi Masalah Pada Server...')
@@ -90,6 +93,18 @@ const deleteBerkas = root => {
 			}
 		])
 		.then(res => res)
+		.catch(err => {
+			console.log(err)
+			throw Error('Terjadi Masalah Pada Server...')
+		})
+}
+
+const deleteBerkasDocument = root => {
+	return BerkasModel.findOneAndUpdate(root.file, { file: null }, { new: true })
+		.then(res => {
+			deleteDocument(root.file)
+			return res
+		})
 		.catch(err => {
 			console.log(err)
 			throw Error('Terjadi Masalah Pada Server...')
@@ -126,6 +141,18 @@ const editBerkas = async root => {
 		console.log(err)
 		throw Error('Terjadi Masalah Saat Menyimpan Data...')
 	}
+}
+
+const editBerkasDocument = root => {
+	return BerkasModel.findByIdAndUpdate(root.id, { file: root.file })
+		.then(res => {
+			deleteDocument(res.file)
+			return res
+		})
+		.catch(err => {
+			console.log(err)
+			throw Error('Terjadi Masalah Pada Server...')
+		})
 }
 
 const berkasesByLokasi = root => {
@@ -222,4 +249,13 @@ const berkasesByPenerima = root => {
 		})
 }
 
-module.exports = { berkases, addBerkas, addBerkasDocument, deleteBerkas, editBerkas }
+const deleteDocument = async file => {
+	try {
+		fs.unlinkSync(path.resolve(__dirname, '../uploads', file))
+		return
+	} catch (err) {
+		return
+	}
+}
+
+module.exports = { berkases, addBerkas, addBerkasDocument, deleteBerkas, deleteBerkasDocument, editBerkas, editBerkasDocument }
