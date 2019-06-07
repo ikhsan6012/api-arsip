@@ -63,7 +63,7 @@ app.get('/lampiran/:link', (req, res) => {
 // Upload Lampiran
 app.post('/upload', (req, res) => {
 	const file = req.files.file
-	const npwp = req.body.npwp.replace(/[-.]/g, '')
+	const npwp = req.body.npwp ? req.body.npwp.replace(/[-.]/g, '') : null
 	const kd_berkas = req.body.kd_berkas
 	const mime = file.name.split('.')[1]
 	const filename = npwp 
