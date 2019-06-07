@@ -77,9 +77,10 @@ const ketBerkasPindah = root => {
 				return
 			})
 			res.wajib_pajak_pindah = wajib_pajak_pindah.length
-			res.lastUpdate = res.berkas.sort((a,b) => {
+			const lastUpdate = res.berkas.sort((a,b) => {
 				return b.updated_at - a.updated_at
-			})[0].updated_at
+			})[0]
+			lastUpdate ? res.lastUpdate = lastUpdate.updated_at : null
 			return res
 		})
 		.catch(err => {
@@ -98,9 +99,10 @@ const ketBerkasSPT = root => {
 			res.berdasarkan_tanggal_terima = res.berkas.filter(b => b.penerima).length
 			res.total = res.berkas.length
 			res.tidak_berdasarkan_tanggal_terima = res.total - res.berdasarkan_tanggal_terima
-			res.lastUpdate = res.berkas.sort((a,b) => {
+			const lastUpdate = res.berkas.sort((a,b) => {
 				return b.updated_at - a.updated_at
-			})[0].updated_at
+			})[0]
+			lastUpdate ? res.lastUpdate = lastUpdate.updated_at : null
 			return res
 		})
 		.catch(err => {
