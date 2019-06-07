@@ -70,7 +70,7 @@ const addBerkas = async root => {
 }
 
 const addBerkasDocument = ({ id, file }) => {
-	return BerkasModel.findByIdAndUpdate(id, { file }, { new: true }).select('_id')
+	return BerkasModel.findByIdAndUpdate(id, { file }, { new: true })
 		.catch(err => {
 			console.log(err)
 			throw Error('Terjadi Masalah Pada Server...')
