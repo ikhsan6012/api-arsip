@@ -5,6 +5,7 @@ ${require('./t-wp2')}
 ${require('./t-berkas2')}
 ${require('./t-penerima2')}
 ${require('./t-lokasi2')}
+${require('./t-lb2')}
 
 type RootQuery{
 	users(nama: String, status: Int): [User]
@@ -20,6 +21,7 @@ type RootQuery{
 	berkases(by: BerkasBy!, gudang: Int, kd_lokasi: String, id: ID): [Berkas]
 	lastUpdateBerkas(kd_berkas: String!): String
 	penerimas(nama_penerima: String, tgl_terima: String): [Penerima]
+	lbs(filter: [FilterLB], sort: [SortLB], skip: Int, limit: Int): [LB]
 }
 
 type RootMutation{
@@ -30,6 +32,10 @@ type RootMutation{
 	deleteBerkasDocument(file: String!): Berkas
 	editBerkas(id: ID!, input: BerkasInput!): Berkas
 	editBerkasDocument(id: ID!, file: String!): Berkas
+	addNDLB(id: ID!, no_nd: String!, tahun_nd: Int!): LB
+	deleteNDLB(id: ID!): LB
+	addTujuanLB(id: ID!, tujuan_nd: String!): LB
+	deleteTujuanLB(id: ID!, tujuan_nd: String!): LB
 }
 
 schema {

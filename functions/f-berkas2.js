@@ -82,17 +82,10 @@ const addBerkasDocument = root => {
 
 const deleteBerkas = root => {
 	return BerkasModel.findByIdAndDelete(root.id)
-		.populate([
-			{
-				path: 'pemilik',
-				select: '_id'
-			},
-			{
-				path: 'penerima',
-				select: '_id'
-			}
-		])
-		.then(res => res)
+		.then(res => {
+			res.file ? deleteDocument(res.file) : null
+			return res
+		})
 		.catch(err => {
 			console.log(err)
 			throw Error('Terjadi Masalah Pada Server...')

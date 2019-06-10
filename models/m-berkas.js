@@ -85,6 +85,7 @@ berkasSchema.post('findOneAndDelete', (doc, next) => {
 	pull.push(LokasiModel.findOneAndUpdate({ berkas: doc.id }, { $pull: { berkas: doc.id } }, { select: 'berkas', new: true }))
 	if(doc.pemilik) pull.push(WPModel.findOneAndUpdate({ berkas: doc.id }, { $pull: { berkas: doc.id } }, { select: 'berkas', new: true }))
 	if(doc.penerima) pull.push(PenerimaModel.findOneAndUpdate({ berkas: doc.id }, { $pull: { berkas: doc.id } }, { select: 'berkas', new: true }))	 
+	next()
 })
 
 module.exports = mongoose.model('Berkas', berkasSchema)

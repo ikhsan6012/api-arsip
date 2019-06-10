@@ -4,4 +4,5 @@ module.exports = {
 	...require('./r-wp2'),
 	...require('./r-berkas2'),
 	...require('./r-penerima2'),
+	...require('./r-lb2'),
 }
