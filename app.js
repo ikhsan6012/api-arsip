@@ -6,6 +6,7 @@ const { buildSchema } = require('graphql')
 const mongoose = require('mongoose')
 const fileUpload = require('express-fileupload')
 const fs = require('fs')
+const path = require('path')
 const LBModel = require('./models/m-lb')
 const { verifyToken2 } = require('./middleware/check-auth')
 
