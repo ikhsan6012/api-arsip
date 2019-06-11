@@ -93,7 +93,7 @@ const deleteBerkas = root => {
 }
 
 const deleteBerkasDocument = root => {
-	return BerkasModel.findOneAndUpdate(root.file, { file: null }, { new: true })
+	return BerkasModel.findOneAndUpdate(root, { file: null }, { new: true })
 		.then(res => {
 			deleteDocument(root.file)
 			return res
