@@ -6,17 +6,23 @@ const { buildSchema } = require('graphql')
 const mongoose = require('mongoose')
 const fileUpload = require('express-fileupload')
 const fs = require('fs')
-const request = require('request')
-const proxy = require('http-proxy').createProxyServer({})
+const LBModel = require('./models/m-lb')
+const { verifyToken2 } = require('./middleware/check-auth')
 
+require('dotenv').config()
 const app = express()
 
 // Resolver
 const rootValue = require('./resolvers')
+const rootValue2 = require('./resolvers/index2')
 
 // Types
 const schema = buildSchema(`
 	${require('./types')}
+`)
+
+const schema2 = buildSchema(`
+	${require('./types/index2')}
 `)
 
 // Middleware
@@ -28,7 +34,17 @@ app.use(fileUpload())
 app.use('/graphql', graphqlHTTP({
 	schema,
 	rootValue,
-	graphiql: true
+	graphiql: true,
+}))
+
+// GraphQL Middleware
+app.use('/graphql2', verifyToken2, graphqlHTTP({
+	schema: schema2,
+	rootValue: rootValue2,
+	graphiql: true,
+	extensions: ({ context }) => {
+		return { token: context.token.token }
+	}
 }))
 
 // Get Lampiran
@@ -47,11 +63,86 @@ app.get('/lampiran/:link', (req, res) => {
 // Upload Lampiran
 app.post('/upload', (req, res) => {
 	const file = req.files.file
-	const npwp = req.body.npwp.replace(/[-.]/g, '')
+	const npwp = req.body.npwp ? req.body.npwp.replace(/[-.]/g, '') : null
+	const kd_berkas = req.body.kd_berkas
 	const mime = file.name.split('.')[1]
-	const filename = new Date().toISOString() + '_' + npwp + '.' + mime
-	fs.writeFileSync(`./uploads/${filename}`, req.files.file.data)
+	const filename = npwp 
+		? kd_berkas + '_' + npwp + '_' + new Date().toISOString() + '.' + mime
+		: kd_berkas + '_' + new Date().toISOString() + '.' + mime
+	fs.writeFileSync(`./uploads/${filename}`, file.data)
 	res.status(200).json({ file: filename })
+})
+
+// Import LB
+app.post('/importlb', (req, res) => {
+	const file = req.files.file
+	const lb = JSON.parse(Buffer.from(file.data).toString())
+	let isValid = true
+	let customMsg = ''
+	let title = "File JSON Tidak Valid..."
+	if(!lb.length){
+		return res.json({ ok: false, message: "File JSON Tidak Valid..." })
+	}
+	const update = lb.map(l => {
+		if(!l.npwp) {
+			isValid = false
+			customMsg = "NPWP"
+			return false
+		}else if(!l.no_tt){
+			isValid = false
+			customMsg = "No. Tanda Terima"
+			return false
+		}else if(!l.tgl_spt){
+			isValid = false
+			customMsg = "Tanggal SPT"
+			return false
+		}else if(!l.nilai){
+			isValid = false
+			customMsg = "Nilai LB"
+			return false
+		}else if(!l.masa_tahun){
+			isValid = false
+			customMsg = "Masa/Tahun Pajak"
+			return false
+		}else if(l.masa_tahun.length === 2){
+			isValid = false
+			title = "Kemungkinan Data yang Diimport Merupakan SPT WP yang Menggunakan Mata Uang Asing."
+			customMsg = 1
+			return false
+		}else if(!l.res_kom){
+			isValid = false
+			customMsg = "Status"
+			return false
+		}else if(!l.sumber){
+			isValid = false
+			customMsg = "Sumber"
+			return false
+		}else if(!l.tgl_terima){
+			isValid = false
+			customMsg = "Tanggal Terima"
+			return false
+		}else{
+			const npwp1 = l.npwp.split('-')[0]
+			const npwp2 = l.npwp.split('-').filter((n, i) => i > 0).join('.')
+			const npwp = `${npwp1}-${npwp2}`
+			return {
+				updateOne: {
+					filter: { no_tt: l.no_tt },
+					update: { ...l, npwp },
+					upsert: true
+				}
+			}
+		}
+	})
+	let message = customMsg !== 1 ? `Terdapat Data yang Tidak Memiliki ${customMsg}...` : "Jika Benar Perbaiki Masa/Tahun Pajak dan Seterusnya!!!"
+	if(!isValid){
+		res.json({ ok: false, title, message })
+	}else{
+		LBModel.bulkWrite(update)
+			.then(({ upsertedCount }) => {
+				res.json({ ok: true, upsertedCount, total: lb.length })
+			})
+	}
 })
 
 // Connect to MongoDB

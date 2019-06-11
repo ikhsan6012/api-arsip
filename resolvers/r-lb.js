@@ -1,8 +1,12 @@
 const { getSPTLB, getTotalSPTLB, addNDLB, deleteNDLB } = require('../functions/f-lb')
+const { checkLogin } = require('../middleware/check-auth')
+
+// const auth = ()
 
 module.exports = {
-    getSPTLB: args => {
-        return getSPTLB(args)
+    getSPTLB: (body, { token }) => {
+        checkLogin(token, [0,2])
+        return getSPTLB(body)
             .then(res => {
                 console.log('Berhasil Mengambil Data SPT LB!')
                 return res

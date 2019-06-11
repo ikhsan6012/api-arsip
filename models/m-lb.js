@@ -17,6 +17,7 @@ const lbSchema = new Schema({
     tgl_jt: String,
     no_nd: String,
     tahun_nd: Number,
+    tujuan_nd: [String]
 })
 
 module.exports = mongoose.model('LB', lbSchema)

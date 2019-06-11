@@ -45,6 +45,7 @@ const getDetailInduk = async kd_berkas => {
 }
 
 const getDetailPindah = async kd_berkas => {
+	console.log(kd_berkas)
 	const { getBerkasByKetBerkas } = require('./f-berkas')
 	let ket_berkas = await KetBerkasModel.findOne({ kd_berkas })
 	return new Promise((resolve, reject) => {

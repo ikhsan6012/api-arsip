@@ -23,7 +23,6 @@ const userSchema = new Schema({
 		required: true,
 		default: 1
 	},
-	token: String,
 	transaksi: [{
 		type: Schema.Types.ObjectId,
 		ref: 'Transaksi'
