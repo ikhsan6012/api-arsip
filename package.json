@@ -22,7 +22,6 @@
     "http-proxy": "^1.17.0",
     "jsonwebtoken": "^8.5.1",
     "merge-graphql-schemas": "^1.5.8",
-    "mongodb-backup": "^1.6.9",
     "mongoose": "^5.4.20",
     "object.fromentries": "^2.0.0",
     "request": "^2.88.0",
