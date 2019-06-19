@@ -1,36 +1,14 @@
 const PenerimaModel = require('../models/m-penerima')
 
-const getPenerimas = input => {
-	return new Promise((resolve, reject) => {
-		return PenerimaModel.find(input)
-			.then(res => resolve(res))
-			.catch(err => reject(err))
-	})
+const penerimas = root => {
+	if(!root.nama_penerima && !root.tgl_terima) throw { error: 'Nama Penerima atau Tgl Terima Diperlukan...' } 
+	root.nama_penerima ? root.nama_penerima = new RegExp(root.nama_penerima, 'i') : null
+	return PenerimaModel.find(root, '-berkas')
+		.catch(err => {
+			err.error ? err = err.error : null
+			console.log(err)
+			throw err
+		})
 }
 
-const checkPenerima = input => {
-	return new Promise((resolve, reject) => {
-		return PenerimaModel.findOne(input)
-			.then(res => resolve(res))
-			.catch(err => reject(err))
-	})
-}
-
-const checkPenerimaById = id => {
-	return new Promise((resolve, reject) => {
-		return PenerimaModel.findById(id)
-			.then(res => resolve(res))
-			.catch(err => reject(err))
-	})
-}
-
-const addPenerima = input => {
-	return new Promise((resolve, reject) => {
-		const Penerima = new PenerimaModel(input)
-		return Penerima.save()
-			.then(res => resolve(res))
-			.catch(err => reject(err))
-	})
-}
-
-module.exports = { getPenerimas, checkPenerima, checkPenerimaById, addPenerima }
+module.exports = { penerimas }

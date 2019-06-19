@@ -8,22 +8,17 @@ const fileUpload = require('express-fileupload')
 const fs = require('fs')
 const path = require('path')
 const LBModel = require('./models/m-lb')
-const { verifyToken2 } = require('./middleware/check-auth')
+const { verifyToken } = require('./middleware/check-auth')
 
 require('dotenv').config()
 const app = express()
 
 // Resolver
 const rootValue = require('./resolvers')
-const rootValue2 = require('./resolvers/index2')
 
 // Types
 const schema = buildSchema(`
 	${require('./types')}
-`)
-
-const schema2 = buildSchema(`
-	${require('./types/index2')}
 `)
 
 // Middleware
@@ -32,16 +27,9 @@ app.use(cors())
 app.use(fileUpload())
 
 // GraphQL Middleware
-app.use('/graphql', graphqlHTTP({
-	schema,
-	rootValue,
-	graphiql: true,
-}))
-
-// GraphQL Middleware
-app.use('/graphql2', verifyToken2, graphqlHTTP({
-	schema: schema2,
-	rootValue: rootValue2,
+app.use('/graphql', verifyToken, graphqlHTTP({
+	schema: schema,
+	rootValue: rootValue,
 	graphiql: true,
 	extensions: ({ context }) => {
 		return { token: context.token.token }

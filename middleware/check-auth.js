@@ -3,20 +3,6 @@ const jwt = require('jsonwebtoken')
 module.exports = {
 	verifyToken: (req, res, next) => {
 		const token = req.headers.authorization ? req.headers.authorization.split(' ')[1] : null
-		!token ? next() : null
-		const data = jwt.verify(token, process.env.SECRET_KEY)
-		const newToken = jwt.sign({
-			_id: data._id,
-			username: data.username,
-			nama: data.nama,
-			status: data.status
-		}, process.env.SECRET_KEY, { expiresIn: '1h' })
-		req.token = data
-		res.setHeader('token', newToken)
-		next()
-	},
-	verifyToken2: (req, res, next) => {
-		const token = req.headers.authorization ? req.headers.authorization.split(' ')[1] : null
 		if(!token) {
 			req.token = {}
 			return next()

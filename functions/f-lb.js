@@ -1,35 +1,54 @@
-const LBModel = require('../models/m-lb')
-const WPModel = require('../models/m-wp')
+const LBModel = require('../models/m-lb.js')
 
-const getSPTLB = ({ pageSize, page, sorted = [], filtered = [] }) => {
-    const skip = pageSize * page
-    const sort = {}, filter = {}
-    sorted.forEach(s => {
-        sort[s.sortBy] = s.order
-    })
-    filtered.forEach(f => {
-        filter[f.filterBy] = new RegExp(f.value, 'i')
-    })
-    return new Promise((resolve, reject) => {
-        return LBModel.find(filter).sort({ ...sort, time_tgl_terima: -1 }).skip(skip).limit(pageSize)
-            .then(res => {
-                resolve(res)
-            })
-            .catch(err => reject(err))
-    })
+const lbs = root => {
+	const sort = {}
+	const filter = {}
+	root.filter ? root.filter.forEach(f => {
+		let regex = f.value
+		if(f.filterBy === 'nd') return filter['$or'] = [{ no_nd: new RegExp(regex, 'i') }, { tahun_nd: regex }]
+		if(f.filterBy === 'npwp') regex = '^'+f.value
+		return filter[f.filterBy] = new RegExp(regex, 'i')
+	}) : null
+	root.sort ? root.sort.forEach(s => {
+		return sort[s.sortBy] = s.desc ? -1 : 1
+	}) : null
+	return LBModel.find(filter).skip(root.skip || 0).limit(root.limit || 10).sort({ ...sort, time_tgl_terima: -1 })
+		.catch(err => {
+			console.log(err)
+			throw err
+		})
 }
 
-
-const getTotalSPTLB = () => {
-    return LBModel.countDocuments()
+const addNDLB = root => {
+	return LBModel.findByIdAndUpdate(root.id, { no_nd: root.no_nd, tahun_nd: root.tahun_nd }, { new: true })
+		.catch(err => {
+			console.log(err)
+			throw err
+		})
 }
 
-const addNDLB = ({ id, value, tahun }) => {
-    return LBModel.findByIdAndUpdate(id, { no_nd: value, tahun_nd: tahun }, { new: true })
+const deleteNDLB = root => {
+	return LBModel.findByIdAndUpdate(root.id, { no_nd: null, tahun_nd: null }, { new: true })
+		.catch(err => {
+			console.log(err)
+			throw err
+		})
 }
 
-const deleteNDLB = id => {
-    return LBModel.findByIdAndUpdate(id, { no_nd: null, tahun_nd: null }, { new: true })
+const addTujuanLB = root => {
+	return LBModel.findByIdAndUpdate(root.id, { $push: { tujuan_nd: root.tujuan_nd } }, { new: true })
+		.catch(err => {
+			console.log(err)
+			throw err
+		})
 }
 
-module.exports = { getSPTLB, getTotalSPTLB, addNDLB, deleteNDLB }
+const deleteTujuanLB = root => {
+	return LBModel.findByIdAndUpdate(root.id, { $pull: { tujuan_nd: root.tujuan_nd } }, { new: true })
+		.catch(err => {
+			console.log(err)
+			throw err
+		})
+}
+
+module.exports = { lbs, addNDLB, deleteNDLB, addTujuanLB, deleteTujuanLB }

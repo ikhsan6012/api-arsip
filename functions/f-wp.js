@@ -1,78 +1,83 @@
 const WPModel = require('../models/m-wp')
 
-const getJumlahWP = () => {
-	return new Promise((resolve, reject) => {
-		return WPModel.countDocuments()
-			.then(res => {
-				resolve(res)
+const wps = root => {
+	!root.begin ? root.begin = 0 : null
+	!root.end ? root.end = 10 : null
+	if(root.by.match(/status/i)) {
+		return wpsByStatus(root)
+	}
+	if(root.by.match(/npwp/i)) {
+		return wpsByNPWP(root)
+	}
+	if(root.by.match(/nama_wp/i)) {
+		return wpsByNamaWP(root)
+	}
+}
+
+const wp = root => {
+	if(!root.npwp) throw Error('NPWP 15 Digit Diperlukan...')
+	return WPModel.findOne(root, '-berkas')
+		.catch(err => {
+			console.log(err)
+			throw Error('Terjadi Masalah Pada Server...')
+		})
+}
+
+const totalWPs = root => {
+	root.nama_wp ? root.nama_wp = new RegExp(root.nama_wp, 'i') : null
+	root.status ? root.status = new RegExp(root.status, 'i') : null
+	return WPModel.countDocuments(root)
+		.catch(err => {
+			console.log(err)
+			throw Error('Terjadi Masalah Pada Server...')
+		})
+}
+
+const lastUpdateWPs = () => {
+	return WPModel.findOne().sort({ updated_at: -1 })
+		.then(res => {
+			return res.updated_at
+		})
+		.catch(err => {
+			console.log(err)
+			throw Error('Terjadi Masalah Pada Server...')
+		})
+}
+
+const wpsByStatus = root => {
+		if(!root.search.status) throw 'Status WP Diperlukan...'
+		else root.search.status = new RegExp(root.search.status, 'i')
+		return WPModel.find(root.search, '-berkas')
+			.skip(root.begin)
+			.limit(root.end)
+			.catch(err => {
+				console.log(err)
+				throw Error('Terjadi Masalah Pada Server...')
 			})
-			.catch(err => reject(err))
-	})
 }
 
-const getWPByNPWP = npwp => {
-	return new Promise((resolve, reject) => {
-		return WPModel.findOne({ npwp })
-			.then(res => resolve(res))
-			.catch(err => reject(err))
-	})
+const wpsByNPWP = root => {
+	if(!root.search.npwp) throw 'NPWP Diperlukan...'
+	else root.search.npwp = new RegExp(root.search.npwp, 'i')
+	return WPModel.find(root.search, '-berkas')
+		.skip(root.begin)
+		.limit(root.end)
+		.catch(err => {
+			console.log(err)
+			throw Error('Terjadi Masalah Pada Server...')
+		})
 }
 
-const getWPById = id => {
-	return new Promise((resolve, reject) => {
-		return WPModel.findById(id)
-			.then(res => resolve(res))
-			.catch(err => reject(err))
-	})
+const wpsByNamaWP = root => {
+	if(!root.search.nama_wp) throw 'Nama WP Diperlukan...'
+	else root.search.nama_wp = new RegExp(root.search.nama_wp, 'i')
+	return WPModel.find(root.search, '-berkas')
+		.skip(root.begin)
+		.limit(root.end)
+		.catch(err => {
+			console.log(err)
+			throw Error('Terjadi Masalah Pada Server...')
+		})
 }
 
-const getWPsByNPWP = npwp => {
-	return new Promise((resolve, reject) => {
-		return WPModel.find({ npwp: new RegExp(`^${npwp}`) })
-			.then(res => resolve(res))
-			.catch(err => reject(err))
-	})
-}
-
-const getWPsByNamaWP = nama_wp => {
-	return new Promise((resolve, reject) => {
-		return WPModel.find({ nama_wp: new RegExp(nama_wp) })
-			.then(res => resolve(res))
-			.catch(err => reject(err))
-	})
-}
-
-const getWPsByStatus = ({status, begin, end }) => {
-	return new Promise((resolve, reject) => {
-		return WPModel.find( status !== 'total' ? { status: new RegExp(status, 'i') } : {})
-			.skip(begin)
-			.limit(end)
-			.then(res => resolve(res))
-			.catch(err => reject(err))
-	})
-}
-
-const getDetailWP = () => {
-	return new Promise((resolve, reject) => {
-		return WPModel.findOne().sort({ updated_at: -1 })
-			.then(async res => {
-				const aktif = await WPModel.countDocuments({ status: "AKTIF" })
-				const de = await WPModel.countDocuments({ status: "DE" })
-				const ne = await WPModel.countDocuments({ status: "NE" })
-				const pindah = await WPModel.countDocuments({ status: "PINDAH" })
-				const total = aktif + de + ne + pindah
-				resolve({ aktif, de, ne, pindah, total, lastUpdate: res.updated_at })
-			})
-	})
-}
-
-const addWP = input => {
-	return new Promise((resolve, reject) => {
-		const WP = new WPModel(input)
-		return WP.save()
-			.then(res => resolve(res))
-			.catch(err => reject(err))
-	})
-}
-
-module.exports = { getJumlahWP, getWPByNPWP, getWPById, getWPsByNPWP, getWPsByNamaWP, getWPsByStatus, getDetailWP, addWP }
+module.exports = { wps, wp, totalWPs, lastUpdateWPs }
