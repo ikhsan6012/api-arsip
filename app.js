@@ -54,11 +54,20 @@ app.post('/upload', (req, res) => {
 	const file = req.files.file
 	const npwp = req.body.npwp ? req.body.npwp.replace(/[-.]/g, '') : null
 	const kd_berkas = req.body.kd_berkas
-	const filename = npwp 
+	const filename = req.body.filename ? req.body.filename : npwp
 		? kd_berkas + '_' + npwp + '_' + new Date().getTime() + '.pdf'
 		: kd_berkas + '_' + new Date().getTime() + '.pdf'
 	fs.writeFileSync(path.resolve(__dirname, 'uploads', filename), file.data)
 	res.status(200).json({ file: filename })
+})
+
+// Delete Lampiran
+app.post('/delete', (req, res) => {
+	const file = req.body.file
+	fs.unlink(path.resolve(__dirname, 'uploads', file), err => {
+		if(err) return res.status(500).json({ errors: 'Gagal Menghapus Dokumen...' })
+		return res.json({ msg: 'Berhasil Menghapus Dokumen...' })
+	})
 })
 
 // Import LB

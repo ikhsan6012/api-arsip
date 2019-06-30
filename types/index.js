@@ -29,9 +29,8 @@ type RootMutation{
 	addBerkas(input: BerkasInput!): Berkas
 	addBerkasDocument(id: ID!, file: String!): Berkas
 	deleteBerkas(id: ID!): Berkas
-	deleteBerkasDocument(file: String!): Berkas
+	deleteBerkasDocument(id: ID!): Berkas
 	editBerkas(id: ID!, input: BerkasInput!): Berkas
-	editBerkasDocument(id: ID!, file: String!): Berkas
 	addNDLB(id: ID!, no_nd: String!, tahun_nd: Int!): LB
 	deleteNDLB(id: ID!): LB
 	addTujuanLB(id: ID!, tujuan_nd: String!): LB
