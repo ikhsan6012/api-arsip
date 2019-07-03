@@ -15,7 +15,6 @@ mongoose.connect('mongodb://localhost:27017/arsip', {
 	.then(async (e) => {
 		try {
 			const collections = await mongoose.connection.db.listCollections().toArray()
-			// console.log(collections)
 			for({ name } of collections){
 				if(name.match(/^berkas$/)){
 					console.log('Menghapus Berkas Collection...')
@@ -37,7 +36,7 @@ mongoose.connect('mongodb://localhost:27017/arsip', {
 					await WPModel.collection.drop()
 					console.log('Berhasil Menghapus WP Collection...')
 				}
-				if(name.match(/^ket_berkas$/)){
+				if(name.match(/^ketberkas$/)){
 					console.log('Menghapus Berkas Dari Ket Berkas...')
 					await KetBerkasModel.updateMany({}, { berkas: [], __v: 1 })
 					console.log('Berhasil Menghapus Berkas Dari Ket Berkas...')

@@ -60,12 +60,13 @@ berkasSchema.post('save', async (doc, next) => {
 	next()
 })
 
-berkasSchema.post('findOneAndDelete', (doc, next) => {
+berkasSchema.post('findOneAndDelete', async (doc, next) => {
 	const pull = []
 	pull.push(KetBerkasModel.findOneAndUpdate({ berkas: doc.id }, { $pull: { berkas: doc.id } }, { select: 'berkas', new: true }))
 	pull.push(LokasiModel.findOneAndUpdate({ berkas: doc.id }, { $pull: { berkas: doc.id } }, { select: 'berkas', new: true }))
-	if(doc.pemilik) pull.push(WPModel.findOneAndUpdate({ berkas: doc.id }, { $pull: { berkas: doc.id } }, { select: 'berkas', new: true }))
-	if(doc.penerima) pull.push(PenerimaModel.findOneAndUpdate({ berkas: doc.id }, { $pull: { berkas: doc.id } }, { select: 'berkas', new: true }))	 
+	pull.push(WPModel.findOneAndUpdate({ berkas: doc.id }, { $pull: { berkas: doc.id } }, { select: 'berkas', new: true }))
+	pull.push(PenerimaModel.findOneAndUpdate({ berkas: doc.id }, { $pull: { berkas: doc.id } }, { select: 'berkas', new: true }))	 
+	await Promise.all(pull)
 	next()
 })
 

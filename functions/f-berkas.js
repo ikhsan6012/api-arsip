@@ -1,6 +1,3 @@
-const fs = require('fs')
-const path = require('path')
-
 const BerkasModel = require('../models/m-berkas')
 const LokasiModel = require('../models/m-lokasi')
 const WPModel = require('../models/m-wp')
@@ -81,15 +78,7 @@ const addBerkasDocument = root => {
 }
 
 const deleteBerkas = root => {
-	return BerkasModel.findByIdAndDelete(root.id)
-		.then(res => {
-			res.file ? deleteDocument(res.file) : null
-			return res
-		})
-		.catch(err => {
-			console.log(err)
-			throw Error('Terjadi Masalah Pada Server...')
-		})
+	return BerkasModel.findByIdAndDelete(root.id, { select: '_id' })
 }
 
 const deleteBerkasDocument = root => {
