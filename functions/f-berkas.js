@@ -89,32 +89,35 @@ const deleteBerkasDocument = root => {
 		})
 }
 
-const editBerkas = async root => {
-	const input = root.input
-	const promise = []
+const editBerkas = async ({ id, input }) => {
+	if(!input.lokasi.gudang || !input.lokasi.kd_lokasi) throw Error('Gudang dan Kd Lokasi Diperlukan...')
+	if(!input.urutan) throw Error('Urutan Diperlukan...')
 	try {
-		if(!input.kd_berkas) throw Error('Kd Berkas Diperlukan...')
-		if(!input.lokasi.gudang || !input.lokasi.kd_lokasi) throw Error('Gudang dan Kd Lokasi Diperlukan...')
-		promise.push(KetBerkasModel.findOne({ kd_berkas: new RegExp(input.kd_berkas, 'i') }, 'berkas'))
-		promise.push(LokasiModel.findOneAndUpdate(input.lokasi, input.lokasi, {
-			upsert: true, new: true
-		}).select('_id'))
-		if(input.pemilik) promise.push(WPModel.findOneAndUpdate({ npwp: input.pemilik.npwp }, input.pemilik, {
-			upsert: true, new: true
-		}).select('_id'))
-		if(input.penerima) promise.push(PenerimaModel.findOneAndUpdate(input.penerima, input.penerima, {
-			upsert: true, new: true
-		}).select('_id'))
-		const All = await Promise.all(promise)
-		const [ket_berkas, lokasi, pemilik, penerima] = All
-		delete input.kd_berkas
-		return BerkasModel.findByIdAndUpdate(root.id, {
-			...input,
-			ket_berkas: ket_berkas.id,
-			lokasi: lokasi.id, 
-			pemilik: pemilik ? pemilik.id : null, 
-			penerima: penerima ? penerima.id : null
-		}, { new: true }).select('_id')
+		const promise1 = [], promise2 = []
+		promise1.push(BerkasModel.findById(id))
+		promise1.push(KetBerkasModel.findOne({ kd_berkas: input.kd_berkas }, '_id'))
+		promise1.push(LokasiModel.findOneAndUpdate(input.lokasi, input.lokasi, { upsert: true, new: true }).select('_id'))
+		promise1.push(!input.pemilik ? null : WPModel.findOneAndUpdate({ npwp: input.pemilik.npwp }, input.pemilik, { upsert: true, new: true }).select('_id'))
+		promise1.push(!input.penerima ? null : PenerimaModel.findOneAndUpdate(input.penerima, input.penerima, { upsert: true, new: true }).select('_id'))
+		const Promise1 = await Promise.all(promise1)
+		const [berkas, ket_berkas, lokasi, pemilik, penerima] = Promise1
+		promise2.push(KetBerkasModel.findByIdAndUpdate(berkas.ket_berkas, { $pull: { berkas: id } }))
+		promise2.push(LokasiModel.findByIdAndUpdate(berkas.lokasi, { $pull: { berkas: id } }))
+		promise2.push(WPModel.findByIdAndUpdate(berkas.pemilik, { $pull: { berkas: id } }))
+		promise2.push(PenerimaModel.findByIdAndUpdate(berkas.penerima, { $pull: { berkas: id } }))
+		await Promise.all(promise2)
+		berkas.ket_berkas = ket_berkas.id
+		berkas.lokasi = lokasi.id
+		berkas.pemilik = pemilik ? pemilik.id : null
+		berkas.penerima = penerima ? penerima.id : null
+		berkas.masa_pajak = input.masa_pajak ? input.masa_pajak : null
+		berkas.tahun_pajak = input.tahun_pajak ? input.tahun_pajak : null
+		berkas.status_pbk = input.status_pbk ? input.status_pbk : null
+		berkas.nomor_pbk = input.nomor_pbk ? input.nomor_pbk : null
+		berkas.tahun_pbk = input.tahun_pbk ? input.tahun_pbk : null
+		berkas.urutan = input.urutan ? input.urutan : null
+		berkas.ket_lain = input.ket_lain ? input.ket_lain : null
+		return berkas.save()
 	} catch (err) {
 		console.log(err)
 		throw Error('Terjadi Masalah Saat Menyimpan Data...')
