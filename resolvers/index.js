@@ -4,5 +4,6 @@ module.exports = {
 	...require('./r-wp'),
 	...require('./r-berkas'),
 	...require('./r-penerima'),
+	...require('./r-lokasi'),
 	...require('./r-lb'),
 }

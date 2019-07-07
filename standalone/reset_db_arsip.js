@@ -6,6 +6,7 @@ const KetBerkasModel = require('../models/m-ket-berkas')
 const LokasiModel = require('../models/m-lokasi')
 const PenerimaModel = require('../models/m-penerima')
 const WPModel = require('../models/m-wp')
+const UserModel = require('../models/m-user')
 
 mongoose.connect('mongodb://localhost:27017/arsip', {
 	useNewUrlParser: true, 
@@ -16,6 +17,11 @@ mongoose.connect('mongodb://localhost:27017/arsip', {
 		try {
 			const collections = await mongoose.connection.db.listCollections().toArray()
 			for({ name } of collections){
+				if(name.match(/^users$/)){
+					console.log('Menghapus User Collection...')
+					await UserModel.updateMany({}, { lokasi: [] })
+					console.log('Berhasil Menghapus Berkas Collection...')
+				}
 				if(name.match(/^berkas$/)){
 					console.log('Menghapus Berkas Collection...')
 					await BerkasModel.collection.drop()

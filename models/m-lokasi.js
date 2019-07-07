@@ -19,7 +19,17 @@ const lokasiSchema = new Schema({
 	berkas: [{
 		type: Schema.Types.ObjectId,
 		ref: 'Berkas'
-	}]
+	}],
+	perekam: {
+		type: Schema.Types.ObjectId,
+		ref: 'User'
+	},
+	completed: {
+		type: Boolean,
+		required: true,
+		default: false
+	},
+	time_completed: Date
 })
 
 module.exports = mongoose.model('Lokasi', lokasiSchema)

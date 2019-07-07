@@ -3,6 +3,7 @@ const LokasiModel = require('../models/m-lokasi')
 const WPModel = require('../models/m-wp')
 const PenerimaModel = require('../models/m-penerima')
 const KetBerkasModel = require('../models/m-ket-berkas')
+const UserModel = require('../models/m-user')
 
 const berkases = root => {
 	let getBerkas
@@ -29,16 +30,20 @@ const addBerkas = async root => {
 	try {
 		if(!input.kd_berkas) throw Error('Kd Berkas Diperlukan...')
 		if(!input.lokasi.gudang || !input.lokasi.kd_lokasi) throw Error('Gudang dan Kd Lokasi Diperlukan...')
-		const ket_berkas = await KetBerkasModel.findOne({ kd_berkas: new RegExp(input.kd_berkas, 'i') }, 'berkas')
-		const lokasi = await LokasiModel.findOneAndUpdate(input.lokasi, input.lokasi, {
+		const perekam = await UserModel.findOne({ username: root.username }, 'berkas')
+		if(!perekam) throw Error('User Tidak Ditemukan...')
+		const lokasi = await LokasiModel.findOneAndUpdate(input.lokasi, { ...input.lokasi, perekam: perekam.id }, {
 			upsert: true, new: true
 		})
+		perekam.lokasi = lokasi.id
+		await perekam.save()
+		const ket_berkas = await KetBerkasModel.findOne({ kd_berkas: new RegExp(input.kd_berkas, 'i') }, 'berkas')
 		const pemilik = input.pemilik ? await WPModel.findOneAndUpdate({ npwp: input.pemilik.npwp }, input.pemilik, {
 			upsert: true, new: true
-		}).select('berkas') : { id: null }
+		}).select('_id') : { id: null }
 		const penerima = input.penerima ? await PenerimaModel.findOneAndUpdate(input.penerima, input.penerima, {
 			upsert: true, new: true
-		}).select('berkas') : { id: null }
+		}).select('_id') : { id: null }
 		delete input.kd_berkas
 		const Berkas = new BerkasModel({
 			...input,

@@ -27,6 +27,10 @@ const userSchema = new Schema({
 		type: Schema.Types.ObjectId,
 		ref: 'Transaksi'
 	}],
+	lokasi: [{
+		type: Schema.Types.ObjectId,
+		ref: 'Lokasi'
+	}]
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
 
 module.exports = mongoose.model('User', userSchema)

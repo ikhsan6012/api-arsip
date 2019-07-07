@@ -4,6 +4,8 @@ module.exports = `
 		gudang: Int
 		kd_lokasi: String
 		berkas: [Berkas]
+		completed: Boolean
+		time_completed: String
 	}
 
 	input LokasiInput {
