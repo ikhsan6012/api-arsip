@@ -23,6 +23,11 @@ const userSchema = new Schema({
 		required: true,
 		default: 1
 	},
+	role: {
+		type: 'String',
+		required: true,
+		default: 'Pelaksana'
+	},
 	transaksi: [{
 		type: Schema.Types.ObjectId,
 		ref: 'Transaksi'

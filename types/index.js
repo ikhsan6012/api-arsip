@@ -31,7 +31,7 @@ type RootMutation{
 	deleteBerkas(id: ID!): Berkas
 	deleteBerkasDocument(id: ID!): Berkas
 	editBerkas(id: ID!, input: BerkasInput!): Berkas
-	setComplete(username: String!, lokasi: ID!, completed: Boolean!): Lokasi
+	setComplete(username: String!, lokasi: ID!, completed: Boolean!, cancel_msg: String): Lokasi
 	addNDLB(id: ID!, no_nd: String!, tahun_nd: Int!): LB
 	deleteNDLB(id: ID!): LB
 	addTujuanLB(id: ID!, tujuan_nd: String!): LB

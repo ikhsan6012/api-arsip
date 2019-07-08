@@ -144,7 +144,7 @@ const berkasesByLokasi = root => {
 				{
 					path: 'lokasi',
 					model: 'Lokasi',
-					select: 'gudang kd_lokasi'
+					select: 'gudang kd_lokasi completed'
 				},
 				{
 					path: 'pemilik',

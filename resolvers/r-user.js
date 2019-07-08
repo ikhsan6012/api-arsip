@@ -34,7 +34,7 @@ module.exports = {
 	},
 	// Mutation
 	addUser: (root, args) => {
-		checkLogin(args)
+		// checkLogin(args)
 		return addUser(root.input)
 			.then(res => {
 				return res

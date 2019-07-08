@@ -29,7 +29,8 @@ const lokasiSchema = new Schema({
 		required: true,
 		default: false
 	},
-	time_completed: Date
+	time_completed: Date,
+	cancel_msg: String
 })
 
 module.exports = mongoose.model('Lokasi', lokasiSchema)

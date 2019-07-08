@@ -11,6 +11,7 @@ module.exports = `
 		username: String!
 		password: String!
 		nama: String!
-		status: Int
+		status: Int!
+		role: String!
 	}
 `
