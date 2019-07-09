@@ -1,8 +1,8 @@
-const { penerimas } = require('../functions/f-penerima2')
+const { setComplete } = require('../functions/f-lokasi')
 
 module.exports = {
-	penerimas: (root, args) => {
-		return penerimas(root)
+	setComplete: (root, args) => {
+		return setComplete(root)
 			.then(res => {
 				return res
 			})

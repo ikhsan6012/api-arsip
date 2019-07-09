@@ -1,23 +1,26 @@
 module.exports = `
 	type WP {
-		_id: ID!
-		npwp: String!
-		nama_wp: String!
-		status: String!
-		berkas: [Berkas]!
+		_id: ID
+		npwp: String
+		nama_wp: String
+		status: String
 	}
 
-	type WPDetail {
-		aktif: Int!
-		de: Int!
-		ne: Int!
-		pindah: Int!
-		total: Int!
-		lastUpdate: String
-	}
-
-	input AddWP {
+	input WPInput {
 		npwp: String!
 		nama_wp: String!
+		status: String
+	}
+
+	input WPSSearch {
+		npwp: String
+		nama_wp: String
+		status: String
+	}
+
+	enum WPSBy {
+		npwp
+		nama_wp
+		status
 	}
 `

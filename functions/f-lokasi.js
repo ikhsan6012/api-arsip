@@ -1,31 +1,14 @@
-const LokasiModel = require('../models/m-lokasi'	)
+const LokasiModel = require('../models/m-lokasi')
+const UserModel = require('../models/m-user')
 
-const checkLokasi = input => {
-	return new Promise((resolve, reject) => {
-		return LokasiModel.findOne(input)
-			.then(res => resolve(res))
-			.catch(err => reject(err))
-	})
+const setComplete = async root => {
+	const user = await UserModel.findOne({ username: root.username }, '_id')
+	if(!user) throw Error('User Tidak Ditemukan...')
+	return LokasiModel.findByIdAndUpdate(root.lokasi, {
+		completed: root.completed, 
+		time_completed: root.completed ? new Date() : null,
+		cancel_msg: root.cancel_msg
+	}, { new: true })
 }
 
-const checkLokasiById = id => {
-	return new Promise((resolve, reject) => {
-		return LokasiModel.findById(id)
-			.then(res => resolve(res))
-			.catch(err => reject(err))
-	})
-}
-
-const addLokasi = input => {
-	return new Promise((resolve, reject) => {
-		const Lokasi = new LokasiModel({
-			gudang: input.gudang,
-			kd_lokasi: input.kd_lokasi
-		})
-		return Lokasi.save()
-			.then(res => resolve(res))
-			.catch(err => reject(err))
-	})
-}
-
-module.exports = { checkLokasi, checkLokasiById, addLokasi }
+module.exports = { setComplete }

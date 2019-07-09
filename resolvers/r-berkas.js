@@ -1,103 +1,64 @@
-const { getBerkasByWP, getBerkasByLokasi, getBerkasByPenerima, addBerkasInduk, addBerkasSPTBaru, addBerkasPBK, addBerkasLainLain, editBerkas, deleteBerkas } = require('../functions/f-berkas')
+const { berkases, addBerkas, addBerkasDocument, deleteBerkas, deleteBerkasDocument, editBerkas, editBerkasDocument } = require('../functions/f-berkas')
 
 module.exports = {
-	getBerkasByWP: ({id}) => {
-		return getBerkasByWP(id)
-		.then(res => {
-			console.log('Berhasil Mengambil Data Berkas!')
-			return res
-		})
-		.catch(err => {
-			console.error('Gagal Mengambil Data Berkas!')
-			throw err
-		})
-	},
-	getBerkasByLokasi: lokasi => {
-		return getBerkasByLokasi(lokasi)
-		.then(res => {
-			console.log('Berhasil Mengambil Data Berkas!')
-			return res
-		})
-		.catch(err => {
-			console.error('Gagal Mengambil Data Berkas!')
-			throw err
-		})
-	},
-	getBerkasByPenerima: ({id}) => {
-		return getBerkasByPenerima(id)
+	berkases: (root, args) => {
+		return berkases(root)
 			.then(res => {
-				console.log('Berhasil Mengambil Data Berkas!')
 				return res
 			})
 			.catch(err => {
-				console.error('Gagal Mengambil Data Berkas!')
+				console.log(err)
 				throw err
 			})
 	},
-	addBerkasInduk: ({input}) => {
-		return addBerkasInduk(input)
+	addBerkas: (root, args) => {
+		return addBerkas(root)
 			.then(res => {
-				console.log('Berhasil Menyimpan Data Berkas!')
 				return res
 			})
 			.catch(err => {
-				console.error('Gagal Menyimpan Data Berkas!')
+				console.log(err)
 				throw err
 			})
 	},
-	addBerkasSPTBaru: ({input}) => {
-		return addBerkasSPTBaru(input)
+	addBerkasDocument: (root, args) => {
+		return addBerkasDocument(root)
 			.then(res => {
-				console.log('Berhasil Menyimpan Data Berkas!')
 				return res
 			})
 			.catch(err => {
-				console.error('Gagal Menyimpan Data Berkas!')
+				console.log(err)
 				throw err
 			})
 	},
-	addBerkasPBK: ({input}) => {
-		return addBerkasPBK(input)
+	deleteBerkas: (root, args) => {
+		return deleteBerkas(root)
 			.then(res => {
-				console.log('Berhasil Menyimpan Data Berkas!')
 				return res
 			})
 			.catch(err => {
-				console.error('Gagal Menyimpan Data Berkas!')
+				console.log(err)
 				throw err
 			})
 	},
-	addBerkasLainLain: ({input}) => {
-		return addBerkasLainLain(input)
+	deleteBerkasDocument: (root, args) => {
+		return deleteBerkasDocument(root)
 			.then(res => {
-				console.log('Berhasil Menyimpan Data Berkas!')
 				return res
 			})
 			.catch(err => {
-				console.error('Gagal Menyimpan Data Berkas!')
+				console.log(err)
 				throw err
 			})
 	},
-	editBerkas: ({id, update}) => {
-		return editBerkas(id, update)
+	editBerkas: (root, args) => {
+		return editBerkas(root)
 			.then(res => {
-				console.log('Berhasil Menyimpan Data Berkas!')
 				return res
 			})
 			.catch(err => {
-				console.error('Gagal Menyimpan Data Berkas!')
+				console.log(err)
 				throw err
 			})
 	},
-	deleteBerkas: ({id}) => {
-		return deleteBerkas(id)
-		.then(res => {
-			console.log('Berhasil Menghapus Data Berkas!')
-			return res
-		})
-		.catch(err => {
-			console.error('Gagal Menghapus Data Berkas!')
-			throw err
-		})
-	}
 }

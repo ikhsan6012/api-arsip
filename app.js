@@ -8,22 +8,17 @@ const fileUpload = require('express-fileupload')
 const fs = require('fs')
 const path = require('path')
 const LBModel = require('./models/m-lb')
-const { verifyToken2 } = require('./middleware/check-auth')
+const { verifyToken } = require('./middleware/check-auth')
 
 require('dotenv').config()
 const app = express()
 
 // Resolver
 const rootValue = require('./resolvers')
-const rootValue2 = require('./resolvers/index2')
 
 // Types
 const schema = buildSchema(`
 	${require('./types')}
-`)
-
-const schema2 = buildSchema(`
-	${require('./types/index2')}
 `)
 
 // Middleware
@@ -32,16 +27,9 @@ app.use(cors())
 app.use(fileUpload())
 
 // GraphQL Middleware
-app.use('/graphql', graphqlHTTP({
-	schema,
-	rootValue,
-	graphiql: true,
-}))
-
-// GraphQL Middleware
-app.use('/graphql2', verifyToken2, graphqlHTTP({
-	schema: schema2,
-	rootValue: rootValue2,
+app.use('/graphql', verifyToken, graphqlHTTP({
+	schema: schema,
+	rootValue: rootValue,
 	graphiql: true,
 	extensions: ({ context }) => {
 		return { token: context.token.token }
@@ -66,11 +54,20 @@ app.post('/upload', (req, res) => {
 	const file = req.files.file
 	const npwp = req.body.npwp ? req.body.npwp.replace(/[-.]/g, '') : null
 	const kd_berkas = req.body.kd_berkas
-	const filename = npwp 
+	const filename = req.body.filename ? req.body.filename : npwp
 		? kd_berkas + '_' + npwp + '_' + new Date().getTime() + '.pdf'
 		: kd_berkas + '_' + new Date().getTime() + '.pdf'
 	fs.writeFileSync(path.resolve(__dirname, 'uploads', filename), file.data)
 	res.status(200).json({ file: filename })
+})
+
+// Delete Lampiran
+app.post('/delete', (req, res) => {
+	const file = req.body.file
+	fs.unlink(path.resolve(__dirname, 'uploads', file), err => {
+		if(err) return res.status(500).json({ errors: 'Gagal Menghapus Dokumen...' })
+		return res.json({ msg: 'Berhasil Menghapus Dokumen...' })
+	})
 })
 
 // Import LB
