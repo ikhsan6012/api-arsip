@@ -11,4 +11,8 @@ const setComplete = async root => {
 	}, { new: true })
 }
 
-module.exports = { setComplete }
+const deleteLokasi = async ({ id }) => {
+	return LokasiModel.findByIdAndDelete(id)
+}
+
+module.exports = { setComplete, deleteLokasi }

@@ -47,4 +47,11 @@ const addUser = input => {
 		})
 }
 
-module.exports = { users, user, totalUsers, addUser }
+const changePassword = async ({ username, password_lama, password_baru }) => {
+	const user = await UserModel.findOne({ username })
+	const isMatch = bcrypt.compareSync(password_lama, user.password)
+	if(!isMatch) throw Error('Password Lama Tidak Cocok...')
+	return UserModel.findByIdAndUpdate(user.id, { password: bcrypt.hashSync(password_baru, 10) })
+}
+
+module.exports = { users, user, totalUsers, addUser, changePassword }

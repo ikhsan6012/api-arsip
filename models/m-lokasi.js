@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const UserModel = require('./m-user')
 const Schema = mongoose.Schema
 
 const lokasiSchema = new Schema({
@@ -31,6 +32,19 @@ const lokasiSchema = new Schema({
 	},
 	time_completed: Date,
 	cancel_msg: String
+})
+
+lokasiSchema.post('findOneAndDelete', async (doc, next) => {
+	const BerkasModel = require('./m-berkas')
+	const promise = []
+	if(doc.berkas.length){
+		for(let berkas of doc.berkas){
+			promise.push(BerkasModel.findByIdAndDelete(berkas))
+		}
+	}
+	if(doc.perekam) promise.push(UserModel.findByIdAndUpdate(doc.perekam, { $pull: { lokasi: doc.id } }))
+	await Promise.all(promise)
+	next()
 })
 
 module.exports = mongoose.model('Lokasi', lokasiSchema)
