@@ -32,7 +32,7 @@ const lokasiSchema = new Schema({
 	},
 	time_completed: Date,
 	cancel_msg: String
-})
+}, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
 
 lokasiSchema.post('findOneAndDelete', async (doc, next) => {
 	const BerkasModel = require('./m-berkas')

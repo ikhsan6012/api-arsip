@@ -135,6 +135,7 @@ const berkasesByLokasi = root => {
 	return LokasiModel.findOne(root, 'berkas')
 		.populate({
 			path: 'berkas',
+			options: { sort: { urutan: -1 } },
 			populate: [
 				{
 					path: 'ket_berkas',

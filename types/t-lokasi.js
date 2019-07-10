@@ -6,6 +6,7 @@ module.exports = `
 		berkas: [Berkas]
 		completed: Boolean
 		time_completed: String
+		created_at: String
 	}
 
 	input LokasiInput {

@@ -1,6 +1,27 @@
 const LokasiModel = require('../models/m-lokasi')
 const UserModel = require('../models/m-user')
 
+const monitorRekam = async root => {
+	const [d, m, y] = root.tgl_rekam.split('/').map((v, i) => {
+		v = parseInt(v)
+		if(i === 1) v -= 1
+		return v
+	})
+	const tgl_rekam = new Date(y, m, d).getTime()
+	const end_tgl_rekam = tgl_rekam + 86400000
+	let perekam = await UserModel.find({ status: { $gte: 1 } })
+	const lokasi = await LokasiModel.find({ created_at: {
+		$gte: tgl_rekam, $lt: end_tgl_rekam
+	} }, '-berkas')
+	for(p of perekam){
+		p.lokasi = []
+		for(l of lokasi){
+			if(p.id == l.perekam) p.lokasi.push(l)
+		}
+	}
+	return perekam
+}
+
 const setComplete = async root => {
 	const user = await UserModel.findOne({ username: root.username }, '_id')
 	if(!user) throw Error('User Tidak Ditemukan...')
@@ -15,4 +36,4 @@ const deleteLokasi = async ({ id }) => {
 	return LokasiModel.findByIdAndDelete(id)
 }
 
-module.exports = { setComplete, deleteLokasi }
+module.exports = { monitorRekam, setComplete, deleteLokasi }
