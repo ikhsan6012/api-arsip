@@ -26,12 +26,14 @@ type RootQuery{
 
 type RootMutation{
 	addUser(input: UserInput!): User
+	changePassword(username: String! password_lama: String!, password_baru: String!): User
 	addBerkas(username: String!, input: BerkasInput!): Berkas
 	addBerkasDocument(id: ID!, file: String!): Berkas
 	deleteBerkas(id: ID!): Berkas
 	deleteBerkasDocument(id: ID!): Berkas
 	editBerkas(id: ID!, input: BerkasInput!): Berkas
 	setComplete(username: String!, lokasi: ID!, completed: Boolean!, cancel_msg: String): Lokasi
+	deleteLokasi(id: ID!): Lokasi
 	addNDLB(id: ID!, no_nd: String!, tahun_nd: Int!): LB
 	deleteNDLB(id: ID!): LB
 	addTujuanLB(id: ID!, tujuan_nd: String!): LB
