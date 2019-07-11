@@ -5,6 +5,7 @@ module.exports = `
 		nama: String!
 		status: Int!
 		token: String
+		lokasi: [Lokasi]
 	}
 
 	input UserInput{
