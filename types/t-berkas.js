@@ -5,6 +5,7 @@ module.exports = `
 		pemilik: WP
 		masa_pajak: Int
 		tahun_pajak: Int
+		pembetulan: Int
 		penerima: Penerima
 		status_pbk: String
 		nomor_pbk: Int
@@ -24,6 +25,7 @@ module.exports = `
 		penerima: PenerimaInput
 		masa_pajak: Int
 		tahun_pajak: Int
+		pembetulan: Int
 		status_pbk: String
 		nomor_pbk: Int
 		tahun_pbk: Int

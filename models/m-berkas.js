@@ -33,6 +33,7 @@ const berkasSchema = new Schema({
 	status_pbk: String,
 	nomor_pbk: Number,
 	tahun_pbk: Number,
+	pembetulan: Number,
 	lokasi: {
 		type: Schema.Types.ObjectId,
 		ref: 'Lokasi',
