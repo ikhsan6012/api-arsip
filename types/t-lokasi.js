@@ -7,6 +7,7 @@ module.exports = `
 		completed: Boolean
 		time_completed: String
 		created_at: String
+		perekam: User
 	}
 
 	input LokasiInput {

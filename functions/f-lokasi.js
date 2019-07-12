@@ -9,17 +9,10 @@ const monitorRekam = async root => {
 	})
 	const tgl_rekam = new Date(y, m, d).getTime()
 	const end_tgl_rekam = tgl_rekam + 86400000
-	let perekam = await UserModel.find({ status: { $gte: 1 } })
 	const lokasi = await LokasiModel.find({ created_at: {
 		$gte: tgl_rekam, $lt: end_tgl_rekam
-	} }, '-berkas')
-	for(p of perekam){
-		p.lokasi = []
-		for(l of lokasi){
-			if(p.id == l.perekam) p.lokasi.push(l)
-		}
-	}
-	return perekam
+	} }, '-berkas').populate('perekam')
+	return lokasi.filter(l => l.perekam.status !== 0 )
 }
 
 const setComplete = async root => {
