@@ -28,13 +28,18 @@ const berkases = root => {
 const addBerkas = async root => {
 	const input = root.input
 	try {
-		if(!input.kd_berkas) throw Error('Kd Berkas Diperlukan...')
-		if(!input.lokasi.gudang || !input.lokasi.kd_lokasi) throw Error('Gudang dan Kd Lokasi Diperlukan...')
-		const perekam = await UserModel.findOne({ username: root.username }, 'berkas')
+		if(!input.kd_berkas) throw { msg: Error('Kd Berkas Diperlukan...') }
+		if(!input.lokasi.gudang || !input.lokasi.kd_lokasi) throw { msg: Error('Gudang dan Kd Lokasi Diperlukan...') }
+		const perekam = await UserModel.findOne({ username: root.username }, 'berkas username')
 		if(!perekam) throw Error('User Tidak Ditemukan...')
-		const lokasi = await LokasiModel.findOneAndUpdate(input.lokasi, { ...input.lokasi, perekam: perekam.id }, {
+		let lokasi = await LokasiModel.findOneAndUpdate(input.lokasi, { ...input.lokasi }, {
 			upsert: true, new: true
 		})
+		if(!lokasi.perekam) {
+			lokasi.perekam = perekam.id
+			lokasi = await lokasi.save()
+		}
+		if((perekam.id != lokasi.perekam) && perekam.username !== 'admin') throw { msg : Error('Anda Tidak Diizinkan Menambahkan Berkas Pada Lokasi Ini...') }
 		perekam.lokasi = lokasi.id
 		await perekam.save()
 		const ket_berkas = await KetBerkasModel.findOne({ kd_berkas: new RegExp(input.kd_berkas, 'i') }, 'berkas')
@@ -69,7 +74,7 @@ const addBerkas = async root => {
 		])
 		.execPopulate()
 	} catch (err) {
-		console.log(err)
+		if(err.msg) throw err.msg
 		throw Error('Terjadi Masalah Saat Menyimpan Data...')
 	}
 }
