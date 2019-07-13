@@ -1,5 +1,6 @@
 const LokasiModel = require('../models/m-lokasi')
 const UserModel = require('../models/m-user')
+const BerkasModel = require('../models/m-berkas')
 
 const monitorRekam = async root => {
 	const [d, m, y] = root.tgl_rekam.split('/').map((v, i) => {
@@ -9,10 +10,13 @@ const monitorRekam = async root => {
 	})
 	const tgl_rekam = new Date(y, m, d).getTime()
 	const end_tgl_rekam = tgl_rekam + 86400000
-	const lokasi = await LokasiModel.find({ created_at: {
-		$gte: tgl_rekam, $lt: end_tgl_rekam
-	} }, '-berkas').populate('perekam')
-	return lokasi.filter(l => l.perekam.status !== 0 )
+	const lokasi = await LokasiModel.find({ 
+		created_at: { $gte: tgl_rekam, $lt: end_tgl_rekam} 
+	}, '-berkas').populate('perekam')
+	return lokasi.filter(l => l.perekam.status !== 0 ).map(async l => {
+		l.jumlah_berkas = await BerkasModel.countDocuments({ lokasi: l.id })
+		return l
+	})
 }
 
 const setComplete = async root => {
