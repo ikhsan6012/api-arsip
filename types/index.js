@@ -22,7 +22,7 @@ type RootQuery{
 	lastUpdateBerkas(kd_berkas: String!): String
 	penerimas(nama_penerima: String, tgl_terima: String): [Penerima]
 	lbs(filter: [FilterLB], sort: [SortLB], skip: Int, limit: Int): [LB]
-	monitorRekam(tgl_rekam: String!): [User]
+	monitorRekam(tgl_rekam: String!): [Lokasi]
 }
 
 type RootMutation{
