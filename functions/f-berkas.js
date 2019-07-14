@@ -31,10 +31,9 @@ const addBerkas = async root => {
 		if(!input.kd_berkas) throw { msg: Error('Kd Berkas Diperlukan...') }
 		if(!input.lokasi.gudang || !input.lokasi.kd_lokasi) throw { msg: Error('Gudang dan Kd Lokasi Diperlukan...') }
 		const perekam = await UserModel.findOne({ username: root.username }, 'berkas username')
-		if(!perekam) throw Error('User Tidak Ditemukan...')
-		let lokasi = await LokasiModel.findOneAndUpdate(input.lokasi, { ...input.lokasi }, {
-			upsert: true, new: true
-		})
+		if(!perekam) throw { msg: Error('User Tidak Ditemukan...') }
+		let lokasi = await LokasiModel.findOne(input.lokasi)
+		if(lokasi.completed) throw { msg: Error('Lokasi Ini Telah Ditandai Selesai. Silahkan Tandai Belum Selesai Sebelum Menambahkan Berkas...') }
 		if(!lokasi.perekam) {
 			lokasi.perekam = perekam.id
 			lokasi = await lokasi.save()
