@@ -22,11 +22,12 @@ const monitorRekam = async root => {
 const setComplete = async root => {
 	const user = await UserModel.findOne({ username: root.username }, '_id')
 	if(!user) throw Error('User Tidak Ditemukan...')
-	return LokasiModel.findByIdAndUpdate(root.lokasi, {
-		completed: root.completed, 
-		time_completed: root.completed ? new Date() : null,
-		cancel_msg: root.cancel_msg
-	}, { new: true })
+	const lokasi = await LokasiModel.findById(root.lokasi)
+	if((lokasi.perekam != user.id) && root.username !== 'admin') throw Error('Anda Tidak Memiliki Akses Pada Lokasi Ini...')
+	lokasi.completed = root.completed
+	lokasi.time_completed = root.completed ? new Date() : null
+	lokasi.cancel_msg = root.cancel_msg
+	return lokasi.save()
 }
 
 const deleteLokasi = async ({ id }) => {
