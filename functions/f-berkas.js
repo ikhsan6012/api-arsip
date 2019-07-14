@@ -30,14 +30,20 @@ const addBerkas = async root => {
 	try {
 		if(!input.kd_berkas) throw { msg: Error('Kd Berkas Diperlukan...') }
 		if(!input.lokasi.gudang || !input.lokasi.kd_lokasi) throw { msg: Error('Gudang dan Kd Lokasi Diperlukan...') }
-		const perekam = await UserModel.findOne({ username: root.username }, 'berkas username')
+		let promise = [
+			UserModel.findOne({ username: root.username }, 'username'),
+			LokasiModel.findOneAndUpdate(input.lokasi, input.lokasi, { upsert: true, new: true }).select('-berkas')
+		]
+		let [perekam, lokasi] = await Promise.all(promise)
 		if(!perekam) throw { msg: Error('User Tidak Ditemukan...') }
-		let lokasi = await LokasiModel.findOne(input.lokasi)
 		if(lokasi.completed) throw { msg: Error('Lokasi Ini Telah Ditandai Selesai. Silahkan Tandai Belum Selesai Sebelum Menambahkan Berkas...') }
+		const sameUrutan = await BerkasModel.findOne({ urutan: input.urutan, lokasi: lokasi.id }, '_id')
+		if(sameUrutan) throw { msg: Error('Tidak Boleh Terdapat Urutan Yang Sama Pada Lokasi Yang Sama...') }
 		if(!lokasi.perekam) {
 			lokasi.perekam = perekam.id
 			lokasi = await lokasi.save()
 		}
+		console.log('test')
 		if((perekam.id != lokasi.perekam) && perekam.username !== 'admin') throw { msg : Error('Anda Tidak Diizinkan Menambahkan Berkas Pada Lokasi Ini...') }
 		perekam.lokasi = lokasi.id
 		await perekam.save()
