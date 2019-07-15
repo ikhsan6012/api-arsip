@@ -5,6 +5,7 @@ module.exports = `
 		kd_lokasi: String
 		berkas: [Berkas]
 		completed: Boolean
+		cancel_msg: String
 		time_completed: String
 		created_at: String
 		perekam: User
