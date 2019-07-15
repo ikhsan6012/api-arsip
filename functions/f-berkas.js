@@ -30,15 +30,22 @@ const addBerkas = async root => {
 	try {
 		if(!input.kd_berkas) throw { msg: Error('Kd Berkas Diperlukan...') }
 		if(!input.lokasi.gudang || !input.lokasi.kd_lokasi) throw { msg: Error('Gudang dan Kd Lokasi Diperlukan...') }
-		let promise = [
+		const promise = [
 			UserModel.findOne({ username: root.username }, 'username'),
 			LokasiModel.findOneAndUpdate(input.lokasi, input.lokasi, { upsert: true, new: true }).select('-berkas')
 		]
 		let [perekam, lokasi] = await Promise.all(promise)
 		if(!perekam) throw { msg: Error('User Tidak Ditemukan...') }
 		if(lokasi.completed) throw { msg: Error('Lokasi Ini Telah Ditandai Selesai. Silahkan Tandai Belum Selesai Sebelum Menambahkan Berkas...') }
-		const sameUrutan = await BerkasModel.findOne({ urutan: input.urutan, lokasi: lokasi.id }, '_id')
+		const promise2 = [
+			BerkasModel.findOne({ urutan: input.urutan, lokasi: lokasi.id }, '_id'),
+			BerkasModel.findOne({ lokasi: lokasi.id }, '-_id urutan').sort({ urutan: -1 })
+		]
+		const [sameUrutan, lastBerkas] = await Promise.all(promise2)
 		if(sameUrutan) throw { msg: Error('Tidak Boleh Terdapat Urutan Yang Sama Pada Lokasi Yang Sama...') }
+		if(lastBerkas){
+			if((input.urutan - lastBerkas.urutan) > 1) throw { msg: Error(`Ada Urutan Yang Terlewat. Urutan Selanjutnya Adalah ${ lastBerkas.urutan + 1 }`) }
+		}
 		if(!lokasi.perekam) {
 			lokasi.perekam = perekam.id
 			lokasi = await lokasi.save()
@@ -126,6 +133,7 @@ const editBerkas = async ({ id, input }) => {
 		berkas.penerima = penerima ? penerima.id : null
 		berkas.masa_pajak = input.masa_pajak ? input.masa_pajak : null
 		berkas.tahun_pajak = input.tahun_pajak ? input.tahun_pajak : null
+		berkas.pembetulan = input.pembetulan ? input.pembetulan : null
 		berkas.status_pbk = input.status_pbk ? input.status_pbk : null
 		berkas.nomor_pbk = input.nomor_pbk ? input.nomor_pbk : null
 		berkas.tahun_pbk = input.tahun_pbk ? input.tahun_pbk : null
