@@ -41,6 +41,7 @@ const deleteLokasi = async ({ id, username }) => {
 	} catch (err) {
 		console.log(err)
 		if(err.msg) throw err.msg
+		throw Error('Terjadi Masalah Pada Server...')
 	}
 	const lokasi = awa
 	return LokasiModel.findByIdAndDelete(id)
