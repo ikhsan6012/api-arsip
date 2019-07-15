@@ -102,12 +102,13 @@ const addBerkasDocument = root => {
 const deleteBerkas = async ({ id, username }) => {
 	try {
 		const promise = [
-			BerkasModel.findById(id, 'lokasi').populate([{ path: 'lokasi', select: 'perekam' }]),
+			BerkasModel.findById(id, 'lokasi').populate([{ path: 'lokasi', select: 'perekam completed' }]),
 			UserModel.findOne({ username })
 		]
 		const [b, p] = await Promise.all(promise)
 		if(!p) throw { msg: Error('User Tidak Ditemukan...') } 
 		if((b.lokasi.perekam != p.id) && (username !== 'admin')) throw { msg: Error('Anda Tidak Diizinkan Menghapus Berkas Pada Lokasi Ini...') }
+		if(b.lokasi.completed) throw { msg: Error('Lokasi Ini Telah Ditandai Selesai. Silahkan Tandai Belum Selesai Sebelum Menghapus Berkas...') }
 		const lokasi = await LokasiModel.findById(b.lokasi._id, 'berkas')
 		if(lokasi.berkas.length <= 1) {
 			await LokasiModel.findByIdAndDelete(b.lokasi._id)
@@ -134,12 +135,14 @@ const editBerkas = async ({ id, username, input }) => {
 	try {
 		const promise1 = [], promise2 = []
 		const promise0 = [
-			LokasiModel.findOne(input.lokasi, 'perekam'),
+			LokasiModel.findOne(input.lokasi, 'perekam completed'),
 			UserModel.findOne({ username }, '_id')
 		]
 		const [l, p] = await Promise.all(promise0)
 		if(!p) throw { msg: Error('User Tidak Ditemukan...') }
+		console.log(l, p.id)
 		if((l.perekam != p.id) && (username !== 'admin')) throw { msg: Error('Anda Tidak Diizinkan Untuk Mengedit Berkas Pada Lokasi Ini...') }
+		if(l.completed) throw { msg: Error('Lokasi Ini Telah Ditandai Selesai. Silahkan Tandai Belum Selesai Sebelum Mengedit Berkas...') }
 		promise1.push(BerkasModel.findById(id))
 		promise1.push(KetBerkasModel.findOne({ kd_berkas: input.kd_berkas }, '_id'))
 		promise1.push(LokasiModel.findOneAndUpdate(input.lokasi, input.lokasi, { upsert: true, new: true }).select('_id'))
@@ -167,7 +170,7 @@ const editBerkas = async ({ id, username, input }) => {
 		return berkas.save()
 	} catch (err) {
 		console.log(err)
-		if(err.msg) throw Error(err.msg)
+		if(err.msg) throw err.msg
 		throw Error('Terjadi Masalah Saat Menyimpan Data...')
 	}
 }
