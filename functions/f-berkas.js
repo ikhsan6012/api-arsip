@@ -43,7 +43,6 @@ const addBerkas = async root => {
 			lokasi.perekam = perekam.id
 			lokasi = await lokasi.save()
 		}
-		console.log('test')
 		if((perekam.id != lokasi.perekam) && perekam.username !== 'admin') throw { msg : Error('Anda Tidak Diizinkan Menambahkan Berkas Pada Lokasi Ini...') }
 		perekam.lokasi = lokasi.id
 		await perekam.save()
