@@ -30,11 +30,11 @@ type RootMutation{
 	changePassword(username: String! password_lama: String!, password_baru: String!): User
 	addBerkas(username: String!, input: BerkasInput!): Berkas
 	addBerkasDocument(id: ID!, file: String!): Berkas
-	deleteBerkas(id: ID!): Berkas
+	deleteBerkas(id: ID!, username: String!): Berkas
 	deleteBerkasDocument(id: ID!): Berkas
-	editBerkas(id: ID!, input: BerkasInput!): Berkas
+	editBerkas(id: ID!, username: String!, input: BerkasInput!): Berkas
 	setComplete(username: String!, lokasi: ID!, completed: Boolean!, cancel_msg: String): Lokasi
-	deleteLokasi(id: ID!): Lokasi
+	deleteLokasi(id: ID!, username: String!): Lokasi
 	addNDLB(id: ID!, no_nd: String!, tahun_nd: Int!): LB
 	deleteNDLB(id: ID!): LB
 	addTujuanLB(id: ID!, tujuan_nd: String!): LB

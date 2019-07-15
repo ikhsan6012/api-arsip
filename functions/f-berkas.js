@@ -46,12 +46,12 @@ const addBerkas = async root => {
 		if(lastBerkas){
 			if((input.urutan - lastBerkas.urutan) > 1) throw { msg: Error(`Ada Urutan Yang Terlewat. Urutan Selanjutnya Adalah ${ lastBerkas.urutan + 1 }`) }
 		}
+		perekam.lokasi = lokasi.id
 		if(!lokasi.perekam) {
 			lokasi.perekam = perekam.id
 			lokasi = await lokasi.save()
 		}
-		if((perekam.id != lokasi.perekam) && perekam.username !== 'admin') throw { msg : Error('Anda Tidak Diizinkan Menambahkan Berkas Pada Lokasi Ini...') }
-		perekam.lokasi = lokasi.id
+		if((perekam.id != lokasi.perekam) && (perekam.username !== 'admin')) throw { msg : Error('Anda Tidak Diizinkan Menambahkan Berkas Pada Lokasi Ini...') }
 		await perekam.save()
 		const ket_berkas = await KetBerkasModel.findOne({ kd_berkas: new RegExp(input.kd_berkas, 'i') }, 'berkas')
 		const pemilik = input.pemilik ? await WPModel.findOneAndUpdate({ npwp: input.pemilik.npwp }, input.pemilik, {
@@ -85,6 +85,7 @@ const addBerkas = async root => {
 		])
 		.execPopulate()
 	} catch (err) {
+		console.log(err)
 		if(err.msg) throw err.msg
 		throw Error('Terjadi Masalah Saat Menyimpan Data...')
 	}
@@ -98,8 +99,25 @@ const addBerkasDocument = root => {
 		})
 }
 
-const deleteBerkas = root => {
-	return BerkasModel.findByIdAndDelete(root.id, { select: '_id' })
+const deleteBerkas = async ({ id, username }) => {
+	try {
+		const promise = [
+			BerkasModel.findById(id, 'lokasi').populate([{ path: 'lokasi', select: 'perekam' }]),
+			UserModel.findOne({ username })
+		]
+		const [b, p] = await Promise.all(promise)
+		if(!p) throw { msg: Error('User Tidak Ditemukan...') } 
+		if((b.lokasi.perekam != p.id) && (username !== 'admin')) throw { msg: Error('Anda Tidak Diizinkan Menghapus Berkas Pada Lokasi Ini...') }
+		const lokasi = await LokasiModel.findById(b.lokasi._id, 'berkas')
+		if(lokasi.berkas.length <= 1) {
+			await LokasiModel.findByIdAndDelete(b.lokasi._id)
+			return { _id: id }
+		}
+		else return BerkasModel.findByIdAndDelete(id, { select: '_id' })
+	} catch (err) {
+		if(err.msg) throw err.msg
+		throw Error('Terjadi Masalah Pada Server...')
+	}
 }
 
 const deleteBerkasDocument = root => {
@@ -110,11 +128,18 @@ const deleteBerkasDocument = root => {
 		})
 }
 
-const editBerkas = async ({ id, input }) => {
-	if(!input.lokasi.gudang || !input.lokasi.kd_lokasi) throw Error('Gudang dan Kd Lokasi Diperlukan...')
-	if(!input.urutan) throw Error('Urutan Diperlukan...')
+const editBerkas = async ({ id, username, input }) => {
+	if(!input.lokasi.gudang || !input.lokasi.kd_lokasi) throw { msg: Error('Gudang dan Kd Lokasi Ditemukan...') }
+	if(!input.urutan) throw { msg: Error('Urutan Diperlukan...') }
 	try {
 		const promise1 = [], promise2 = []
+		const promise0 = [
+			LokasiModel.findOne(input.lokasi, 'perekam'),
+			UserModel.findOne({ username }, '_id')
+		]
+		const [l, p] = await Promise.all(promise0)
+		if(!p) throw { msg: Error('User Tidak Ditemukan...') }
+		if((l.perekam != p.id) && (username !== 'admin')) throw { msg: Error('Anda Tidak Diizinkan Untuk Mengedit Berkas Pada Lokasi Ini...') }
 		promise1.push(BerkasModel.findById(id))
 		promise1.push(KetBerkasModel.findOne({ kd_berkas: input.kd_berkas }, '_id'))
 		promise1.push(LokasiModel.findOneAndUpdate(input.lokasi, input.lokasi, { upsert: true, new: true }).select('_id'))
@@ -142,6 +167,7 @@ const editBerkas = async ({ id, input }) => {
 		return berkas.save()
 	} catch (err) {
 		console.log(err)
+		if(err.msg) throw Error(err.msg)
 		throw Error('Terjadi Masalah Saat Menyimpan Data...')
 	}
 }

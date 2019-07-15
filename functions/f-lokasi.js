@@ -30,7 +30,19 @@ const setComplete = async root => {
 	return lokasi.save()
 }
 
-const deleteLokasi = async ({ id }) => {
+const deleteLokasi = async ({ id, username }) => {
+	try {
+		const [l, p] = await Promise.all([
+			LokasiModel.findById(id, 'perekam'),
+			UserModel.findOne({ username })
+		])
+		if((l.perekam != p.id) && (username !== 'admin')) throw { msg: Error('Anda Tidak Diizinkan Menghapus Lokasi Ini...') }
+		return LokasiModel.findByIdAndDelete(id)
+	} catch (err) {
+		console.log(err)
+		if(err.msg) throw err.msg
+	}
+	const lokasi = awa
 	return LokasiModel.findByIdAndDelete(id)
 }
 
