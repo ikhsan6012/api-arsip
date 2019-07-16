@@ -51,13 +51,26 @@ const berkasSchema = new Schema({
 	file: String
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
 
-berkasSchema.post('save', async (doc, next) => {
-	const promise = []
-	promise.push(KetBerkasModel.findByIdAndUpdate(doc.ket_berkas, { $push: { berkas: doc.id } }, { select: 'berkas', new: true }))
-	promise.push(LokasiModel.findByIdAndUpdate(doc.lokasi, { $push: { berkas: doc.id } }, { select: 'berkas', new: true }))
-	if(doc.pemilik) promise.push(WPModel.findByIdAndUpdate(doc.pemilik, { $push: { berkas: doc.id } }, { select: 'berkas', new: true })) 
-	if(doc.penerima) promise.push(PenerimaModel.findByIdAndUpdate(doc.penerima, { $push: { berkas: doc.id } }, { select: 'berkas', new: true })) 
-	await Promise.all(promise)
+berkasSchema.pre('findOneAndUpdate', async function(next){
+	const filter = { berkas: this._conditions._id }
+	const update = { $pull: filter }, options = { new: true }
+	await Promise.all([
+		KetBerkasModel.findOneAndUpdate(filter, update, options),
+		LokasiModel.findOneAndUpdate(filter, update, options),
+		WPModel.findOneAndUpdate(filter, update, options),
+		PenerimaModel.findOneAndUpdate(filter, update, options)
+	])
+	next()
+})
+
+berkasSchema.post(/save|findOneAndUpdate/, async (doc, next) => {
+	const update = { $push: { berkas:  doc.id } }, options = { new: true }
+	await Promise.all([
+		KetBerkasModel.findByIdAndUpdate(doc.ket_berkas, update, options),
+		LokasiModel.findByIdAndUpdate(doc.lokasi, update, options),
+		WPModel.findByIdAndUpdate(doc.pemilik, update, options),
+		PenerimaModel.findByIdAndUpdate(doc.penerima, update, options)
+	])
 	next()
 })
 

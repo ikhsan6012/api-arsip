@@ -42,7 +42,7 @@ const addBerkas = async root => {
 			BerkasModel.findOne({ lokasi: lokasi.id }, '-_id urutan').sort({ urutan: -1 })
 		]
 		const [sameUrutan, lastBerkas] = await Promise.all(promise2)
-		if(sameUrutan) throw { msg: Error('Tidak Boleh Terdapat Urutan Yang Sama Pada Lokasi Yang Sama...') }
+		if(sameUrutan) throw { msg: Error('Tidak Diperkenankan Terdapat Urutan Yang Sama Pada Lokasi Yang Sama...') }
 		if(lastBerkas){
 			if((input.urutan - lastBerkas.urutan) > 1) throw { msg: Error(`Ada Urutan Yang Terlewat. Urutan Selanjutnya Adalah ${ lastBerkas.urutan + 1 }`) }
 		}
@@ -129,49 +129,94 @@ const deleteBerkasDocument = root => {
 		})
 }
 
+// const editBerkas = async ({ id, username, input }) => {
+// 	if(!input.lokasi.gudang || !input.lokasi.kd_lokasi) throw { msg: Error('Gudang dan Kd Lokasi Ditemukan...') }
+// 	if(!input.urutan) throw { msg: Error('Urutan Diperlukan...') }
+// 	try {
+// 		const promise1 = [], promise2 = []
+// 		const promise0 = [
+// 			LokasiModel.findOne(input.lokasi, 'perekam completed'),
+// 			UserModel.findOne({ username }, '_id')
+// 		]
+// 		const [l, p] = await Promise.all(promise0)
+// 		if(!p) throw { msg: Error('User Tidak Ditemukan...') }
+// 		if(l){
+// 			if((l.perekam != p.id) && (username !== 'admin')) throw { msg: Error('Anda Tidak Diizinkan Untuk Mengedit Berkas Pada Lokasi Ini...') }
+// 			if(l.completed) throw { msg: Error('Lokasi Ini Telah Ditandai Selesai. Silahkan Tandai Belum Selesai Sebelum Mengedit Berkas...') }
+// 		}
+// 		promise1.push(BerkasModel.findById(id))
+// 		promise1.push(KetBerkasModel.findOne({ kd_berkas: input.kd_berkas }, '_id'))
+// 		promise1.push(LokasiModel.findOneAndUpdate(input.lokasi, !l ? { ...input.lokasi, perekam: p.id } : input.lokasi, { upsert: true, new: true }).select('_id berkas'))
+// 		promise1.push(!input.pemilik ? null : WPModel.findOneAndUpdate({ npwp: input.pemilik.npwp }, input.pemilik, { upsert: true, new: true }).select('_id'))
+// 		promise1.push(!input.penerima ? null : PenerimaModel.findOneAndUpdate(input.penerima, input.penerima, { upsert: true, new: true }).select('_id'))
+// 		const Promise1 = await Promise.all(promise1)
+// 		const [berkas, ket_berkas, lokasi, pemilik, penerima] = Promise1
+// 		const update = { $pull: { berkas: id } }
+// 		promise2.push(KetBerkasModel.findByIdAndUpdate(berkas.ket_berkas, update))
+// 		promise2.push(LokasiModel.findByIdAndUpdate(berkas.lokasi, update))
+// 		promise2.push(WPModel.findByIdAndUpdate(berkas.pemilik, update))
+// 		promise2.push(PenerimaModel.findByIdAndUpdate(berkas.penerima, update))
+// 		Promise.all(promise2)
+// 		berkas.ket_berkas = ket_berkas.id
+// 		berkas.lokasi = lokasi.id
+// 		berkas.pemilik = pemilik ? pemilik.id : null
+// 		berkas.penerima = penerima ? penerima.id : null
+// 		berkas.masa_pajak = input.masa_pajak ? input.masa_pajak : null
+// 		berkas.tahun_pajak = input.tahun_pajak ? input.tahun_pajak : null
+// 		berkas.pembetulan = input.pembetulan ? input.pembetulan : null
+// 		berkas.status_pbk = input.status_pbk ? input.status_pbk : null
+// 		berkas.nomor_pbk = input.nomor_pbk ? input.nomor_pbk : null
+// 		berkas.tahun_pbk = input.tahun_pbk ? input.tahun_pbk : null
+// 		berkas.urutan = input.urutan ? input.urutan : null
+// 		berkas.ket_lain = input.ket_lain ? input.ket_lain : null
+// 		return berkas.save()
+// 	} catch (err) {
+// 		console.log(err)
+// 		if(err.msg) throw err.msg
+// 		throw Error('Terjadi Masalah Saat Menyimpan Data...')
+// 	}
+// }
+
 const editBerkas = async ({ id, username, input }) => {
-	if(!input.lokasi.gudang || !input.lokasi.kd_lokasi) throw { msg: Error('Gudang dan Kd Lokasi Ditemukan...') }
+	if(!input.lokasi.gudang || !input.lokasi.kd_lokasi) throw { msg: Error('Gudang dan Kd Lokasi Diperlukan...') }
 	if(!input.urutan) throw { msg: Error('Urutan Diperlukan...') }
 	try {
-		const promise1 = [], promise2 = []
-		const promise0 = [
-			LokasiModel.findOne(input.lokasi, 'perekam completed'),
-			UserModel.findOne({ username }, '_id')
-		]
-		const [l, p] = await Promise.all(promise0)
-		if(!p) throw { msg: Error('User Tidak Ditemukan...') }
-		console.log(l, p.id)
-		if((l.perekam != p.id) && (username !== 'admin')) throw { msg: Error('Anda Tidak Diizinkan Untuk Mengedit Berkas Pada Lokasi Ini...') }
-		if(l.completed) throw { msg: Error('Lokasi Ini Telah Ditandai Selesai. Silahkan Tandai Belum Selesai Sebelum Mengedit Berkas...') }
-		promise1.push(BerkasModel.findById(id))
-		promise1.push(KetBerkasModel.findOne({ kd_berkas: input.kd_berkas }, '_id'))
-		promise1.push(LokasiModel.findOneAndUpdate(input.lokasi, input.lokasi, { upsert: true, new: true }).select('_id'))
-		promise1.push(!input.pemilik ? null : WPModel.findOneAndUpdate({ npwp: input.pemilik.npwp }, input.pemilik, { upsert: true, new: true }).select('_id'))
-		promise1.push(!input.penerima ? null : PenerimaModel.findOneAndUpdate(input.penerima, input.penerima, { upsert: true, new: true }).select('_id'))
-		const Promise1 = await Promise.all(promise1)
-		const [berkas, ket_berkas, lokasi, pemilik, penerima] = Promise1
-		promise2.push(KetBerkasModel.findByIdAndUpdate(berkas.ket_berkas, { $pull: { berkas: id } }))
-		promise2.push(LokasiModel.findByIdAndUpdate(berkas.lokasi, { $pull: { berkas: id } }))
-		promise2.push(WPModel.findByIdAndUpdate(berkas.pemilik, { $pull: { berkas: id } }))
-		promise2.push(PenerimaModel.findByIdAndUpdate(berkas.penerima, { $pull: { berkas: id } }))
-		await Promise.all(promise2)
-		berkas.ket_berkas = ket_berkas.id
-		berkas.lokasi = lokasi.id
-		berkas.pemilik = pemilik ? pemilik.id : null
-		berkas.penerima = penerima ? penerima.id : null
-		berkas.masa_pajak = input.masa_pajak ? input.masa_pajak : null
-		berkas.tahun_pajak = input.tahun_pajak ? input.tahun_pajak : null
-		berkas.pembetulan = input.pembetulan ? input.pembetulan : null
-		berkas.status_pbk = input.status_pbk ? input.status_pbk : null
-		berkas.nomor_pbk = input.nomor_pbk ? input.nomor_pbk : null
-		berkas.tahun_pbk = input.tahun_pbk ? input.tahun_pbk : null
-		berkas.urutan = input.urutan ? input.urutan : null
-		berkas.ket_lain = input.ket_lain ? input.ket_lain : null
-		return berkas.save()
+		const [berkas_lama, perekam, ket_berkas, lokasi, pemilik, penerima] = await Promise.all([
+			BerkasModel.findById(id).populate('lokasi'),
+			UserModel.findOne({ username: username }, '-password'),
+			KetBerkasModel.findOne({ kd_berkas: input.kd_berkas }),
+			LokasiModel.findOneAndUpdate(input.lokasi, input.lokasi, { upsert: true, new: true }),
+			input.pemilik ? WPModel.findOneAndUpdate(input.pemilik, input.pemilik, { upsert: true, new: true }) : null,
+			input.penerima ? PenerimaModel.findOneAndUpdate(input.penerima, input.penerima, { upsert: true, new: true }) : null
+		])
+		if(!perekam) throw { msg: 'User Tidak Ditemukan...' }
+		if(lokasi.perekam && (lokasi.perekam != perekam.id) && (username !== 'admin')) throw { msg: Error('Anda Tidak Diizinkan Mengedit Berkas Pada Lokasi Ini...') }
+		if(!(input.urutan === berkas_lama.urutan && lokasi.id == berkas_lama.lokasi._id)){
+			const validator = await BerkasModel.findOne({ urutan: input.urutan, lokasi: lokasi.id })
+			if(validator) throw { msg: Error('Tidak Diperkenankan Terdapat Urutan Yang Sama Pada Lokasi Yang Sama...') }
+		}
+		delete input.kd_berkas
+		const update = {
+			...input,
+			ket_berkas: ket_berkas.id,
+			perekam: perekam.id,
+			lokasi: lokasi.id,
+			pemilik: pemilik ? pemilik.id: null,
+			penerima: penerima ? penerima.id : null,
+		}
+		lokasi.perekam = perekam.id
+		const [berkas_baru] = await Promise.all([
+			BerkasModel.findByIdAndUpdate(id, update, { new: true }),
+			lokasi.save()
+		])
+		if(berkas_lama.lokasi._id != lokasi.id) {
+			if(berkas_lama.lokasi.berkas.length <= 1) await LokasiModel.findByIdAndDelete(berkas_lama.lokasi._id)
+		}
+		return berkas_baru
 	} catch (err) {
 		console.log(err)
 		if(err.msg) throw err.msg
-		throw Error('Terjadi Masalah Saat Menyimpan Data...')
+		throw Error('Terjadi Masalah Pada Server...')
 	}
 }
 

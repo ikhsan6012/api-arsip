@@ -12,7 +12,7 @@ const monitorRekam = async root => {
 	const end_tgl_rekam = tgl_rekam + 86400000
 	const lokasi = await LokasiModel.find({ 
 		created_at: { $gte: tgl_rekam, $lt: end_tgl_rekam}
-	}, '-berkas').populate([{ path: 'perekam', select: 'nama' }])
+	}, '-berkas').populate([{ path: 'perekam', select: 'status nama' }])
 	return lokasi.filter(l => l.perekam.status !== 0 ).map(async l => {
 		l.jumlah_berkas = await BerkasModel.countDocuments({ lokasi: l.id })
 		return l
