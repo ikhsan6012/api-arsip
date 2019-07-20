@@ -6,4 +6,5 @@ module.exports = {
 	...require('./r-penerima'),
 	...require('./r-lokasi'),
 	...require('./r-lb'),
+	...require('./r-perekaman'),
 }

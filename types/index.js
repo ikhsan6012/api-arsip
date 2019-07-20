@@ -6,6 +6,7 @@ ${require('./t-berkas')}
 ${require('./t-penerima')}
 ${require('./t-lokasi')}
 ${require('./t-lb')}
+${require('./t-perekaman')}
 
 type RootQuery{
 	users(nama: String, status: Int): [User]
@@ -22,7 +23,9 @@ type RootQuery{
 	lastUpdateBerkas(kd_berkas: String!): String
 	penerimas(nama_penerima: String, tgl_terima: String): [Penerima]
 	lbs(filter: [FilterLB], sort: [SortLB], skip: Int, limit: Int): [LB]
+	resumeRekam: [ResumeRekam]
 	monitorRekam(tgl_rekam: String!): [Lokasi]
+	detailsResume(tgl_rekam: String!): [DetailResume]
 }
 
 type RootMutation{
