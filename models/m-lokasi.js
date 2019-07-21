@@ -34,6 +34,12 @@ const lokasiSchema = new Schema({
 	cancel_msg: String
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
 
+lokasiSchema.post('findOneAndUpdate', async (doc, next) => {
+	const UserModel = require('./m-user')
+	// const perekam = await UserModel.findById(doc.perekam)
+	next()
+})
+
 lokasiSchema.post('findOneAndDelete', async (doc, next) => {
 	const BerkasModel = require('./m-berkas')
 	const promise = []
