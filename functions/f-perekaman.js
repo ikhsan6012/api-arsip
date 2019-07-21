@@ -25,8 +25,8 @@ const resumeRekam = async () => {
 				])
 				return { lokasi: { selesai, belum, total: selesai + belum }, berkas }
 			}
-			const [y,m,d] = tgl_rekam.split(/\/|-/).map(v => parseInt(v))
-			const minDate = new Date(y,m-1,d).getTime()
+			const tgl = new Date(tgl_rekam)
+			const minDate = new Date(tgl.getFullYear(), tgl.getMonth(), tgl.getDate()).getTime()
 			const $gte = objectIdFromDate(new Date(minDate))
 			const $lt = objectIdFromDate(new Date(minDate+86400000))
 			const [selesai, belum, berkas] = await Promise.all([
