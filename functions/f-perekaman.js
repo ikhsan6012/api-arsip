@@ -11,8 +11,6 @@ const objectIdFromDate = date => {
 }
 
 const resumeRekam = async () => {
-	const date = new Date()
-	console.log(date.getDate(), date.getMonth(), date.getFullYear())
 	try {
 		const lokasis = await LokasiModel.find({}, '_id')
 		const tgl_rekams = [ 's.d. Sekarang', ...new Set(lokasis.map(v => dateFromObjectId(v.id).toLocaleString('id', { day: '2-digit', month: '2-digit', year: 'numeric' })))]
