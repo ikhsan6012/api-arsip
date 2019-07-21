@@ -51,8 +51,6 @@ const addBerkas = async root => {
 			lokasi = await lokasi.save()
 		}
 		if((perekam.id != lokasi.perekam) && (perekam.username !== 'admin')) throw { msg : Error('Anda Tidak Diizinkan Menambahkan Berkas Pada Lokasi Ini...') }
-		perekam.lokasi.push(lokasi.id)
-		await perekam.save()
 		const ket_berkas = await KetBerkasModel.findOne({ kd_berkas: new RegExp(input.kd_berkas, 'i') }, 'berkas')
 		const pemilik = input.pemilik ? await WPModel.findOneAndUpdate({ npwp: input.pemilik.npwp }, input.pemilik, {
 			upsert: true, new: true

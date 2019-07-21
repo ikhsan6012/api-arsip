@@ -36,7 +36,13 @@ const lokasiSchema = new Schema({
 
 lokasiSchema.post('findOneAndUpdate', async (doc, next) => {
 	const UserModel = require('./m-user')
-	// const perekam = await UserModel.findById(doc.perekam)
+	if(doc.perekam){
+		const perekam = await UserModel.findById(doc.perekam)
+		if(!perekam.lokasi.includes(doc.id)){
+			perekam.lokasi.push(doc.id)
+			await perekam.save()
+		}
+	}
 	next()
 })
 
