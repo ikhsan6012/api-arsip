@@ -13,7 +13,6 @@
 # production
 /build
 /uploads
-/standalone
 
 # misc
 .DS_Store

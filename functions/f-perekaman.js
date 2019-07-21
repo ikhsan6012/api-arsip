@@ -11,9 +11,11 @@ const objectIdFromDate = date => {
 }
 
 const resumeRekam = async () => {
+	const date = new Date()
+	console.log(date.getDate(), date.getMonth(), date.getFullYear())
 	try {
 		const lokasis = await LokasiModel.find({}, '_id')
-		const tgl_rekams = [ 's.d. Sekarang', ...new Set(lokasis.map(v => dateFromObjectId(v.id).toLocaleDateString()))]
+		const tgl_rekams = [ 's.d. Sekarang', ...new Set(lokasis.map(v => dateFromObjectId(v.id).toLocaleString('id', { day: '2-digit', month: '2-digit', year: 'numeric' })))]
 		const jml_per_tgl = await Promise.all(tgl_rekams.map(async tgl_rekam => {
 			if(tgl_rekam === 's.d. Sekarang'){
 				const [selesai, belum, berkas] = await Promise.all([
@@ -23,7 +25,7 @@ const resumeRekam = async () => {
 				])
 				return { lokasi: { selesai, belum, total: selesai + belum }, berkas }
 			}
-			const [m,d,y] = tgl_rekam.split('/').map(v => parseInt(v))
+			const [y,m,d] = tgl_rekam.split(/\/|-/).map(v => parseInt(v))
 			const minDate = new Date(y,m-1,d).getTime()
 			const $gte = objectIdFromDate(new Date(minDate))
 			const $lt = objectIdFromDate(new Date(minDate+86400000))
@@ -47,15 +49,16 @@ const resumeRekam = async () => {
 const detailsResume = async ({ tgl_rekam }) => {
 	try {
 		const promise = []
-		if(tgl_rekam !== 's.d. Sekarang'){
-			const [d,m,y] = tgl_rekam.split('/').map((v,i) => i === 1 ? parseInt(v) - 1 : parseInt(v))
-			const date = new Date(y,m,d).getTime()
+		if(tgl_rekam !== 'Sekarang'){
+			const [d,m,y] = tgl_rekam.split('/').map(v => parseInt(v))
+			const date = new Date(y,m-1,d).getTime()
 			const $gte = objectIdFromDate(new Date(date))
 			const $lt = objectIdFromDate(new Date(date + 86400000))
-			promise.push(UserModel.find({ lokasi: { $gte, $lt } }, 'nama lokasi').populate([
+			promise.push(UserModel.find({}, 'nama lokasi').populate([
 				{
 					path: 'lokasi',
-					select: 'berkas completed'
+					select: 'berkas completed',
+					match: { _id: { $gte, $lt } }
 				}
 			]))
 		} else {
@@ -67,7 +70,6 @@ const detailsResume = async ({ tgl_rekam }) => {
 			]))
 		}
 		const [perekams] = await Promise.all(promise)
-		console.log(perekams)
 		const details = []
 		for(let perekam of perekams){
 			const total = perekam.lokasi.length

@@ -2,18 +2,24 @@ const LokasiModel = require('../models/m-lokasi')
 const UserModel = require('../models/m-user')
 const BerkasModel = require('../models/m-berkas')
 
+const objectIdFromDate = date => {
+	return Math.floor(date.getTime() / 1000).toString(16) + "0000000000000000";
+}
+
+const dateFromObjectId = objectId => {
+	return new Date(parseInt(objectId.substring(0, 8), 16) * 1000);
+}
+
 const monitorRekam = async root => {
-	const [d, m, y] = root.tgl_rekam.split('/').map((v, i) => {
-		v = parseInt(v)
-		if(i === 1) v -= 1
-		return v
-	})
-	const tgl_rekam = new Date(y, m, d).getTime()
-	const end_tgl_rekam = tgl_rekam + 86400000
+	const [d, m, y] = root.tgl_rekam.split('/').map(v => parseInt(v))
+	const minDate = new Date(y, m-1, d).getTime()
+	const tgl_rekam = objectIdFromDate(new Date(minDate))
+	const end_tgl_rekam = objectIdFromDate(new Date(minDate+86400000))
 	const lokasi = await LokasiModel.find({ 
-		created_at: { $gte: tgl_rekam, $lt: end_tgl_rekam}
+		_id: { $gte: tgl_rekam, $lt: end_tgl_rekam}
 	}, '-berkas').populate([{ path: 'perekam', select: 'status nama' }])
-	return lokasi.filter(l => l.perekam.status !== 0 ).map(async l => {
+	return lokasi.map(async l => {
+		l.created_at = dateFromObjectId(l.id)
 		l.jumlah_berkas = await BerkasModel.countDocuments({ lokasi: l.id })
 		return l
 	})
@@ -43,8 +49,6 @@ const deleteLokasi = async ({ id, username }) => {
 		if(err.msg) throw err.msg
 		throw Error('Terjadi Masalah Pada Server...')
 	}
-	const lokasi = awa
-	return LokasiModel.findByIdAndDelete(id)
 }
 
 module.exports = { monitorRekam, setComplete, deleteLokasi }
