@@ -11,18 +11,33 @@ const dateFromObjectId = objectId => {
 }
 
 const monitorRekam = async root => {
-	const [d, m, y] = root.tgl_rekam.split('/').map(v => parseInt(v))
-	const minDate = new Date(y, m-1, d).getTime()
-	const tgl_rekam = objectIdFromDate(new Date(minDate))
-	const end_tgl_rekam = objectIdFromDate(new Date(minDate+86400000))
-	const lokasi = await LokasiModel.find({ 
-		_id: { $gte: tgl_rekam, $lt: end_tgl_rekam}
-	}, '-berkas').populate([{ path: 'perekam', select: 'status nama' }])
-	return lokasi.map(async l => {
-		l.created_at = dateFromObjectId(l.id)
-		l.jumlah_berkas = await BerkasModel.countDocuments({ lokasi: l.id })
-		return l
-	})
+	try {
+		if(!root.tgl_rekam && !root.perekam) throw { msg: Error('Tanggal Rekam Atau Perekam Diperlukan...') }
+		let query = {}
+		if(root.tgl_rekam){
+			const [d, m, y] = root.tgl_rekam.split('/').map(v => parseInt(v))
+			const minDate = new Date(y, m-1, d).getTime()
+			const tgl_rekam = objectIdFromDate(new Date(minDate))
+			const end_tgl_rekam = objectIdFromDate(new Date(minDate+86400000))
+			query = { _id: { $gte: tgl_rekam, $lt: end_tgl_rekam} }
+		}
+		if(root.perekam){
+			root.perekam = new RegExp(root.perekam, 'i')
+			const perekam = await UserModel.findOne({ nama: root.perekam }, '_id')
+			if(!perekam) throw { msg: Error('Nama Perekam Tidak Cocok...') }
+			query = { perekam: perekam.id }
+		}
+		let lokasi = await LokasiModel.find(query, '-berkas').populate([{ path: 'perekam', select: 'status nama' }])
+		return lokasi.map(async l => {
+			l.created_at = dateFromObjectId(l.id)
+			l.jumlah_berkas = await BerkasModel.countDocuments({ lokasi: l.id })
+			return l
+		})
+	} catch (err) {
+		console.log(err)
+		if(err.msg) throw err.msg
+		throw Error('Terjadi Masalah Pada Server...')
+	}
 }
 
 const setComplete = async root => {

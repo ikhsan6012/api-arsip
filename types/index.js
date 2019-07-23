@@ -24,7 +24,7 @@ type RootQuery{
 	penerimas(nama_penerima: String, tgl_terima: String): [Penerima]
 	lbs(filter: [FilterLB], sort: [SortLB], skip: Int, limit: Int): [LB]
 	resumeRekam: [ResumeRekam]
-	monitorRekam(tgl_rekam: String!): [Lokasi]
+	monitorRekam(tgl_rekam: String, perekam: String): [Lokasi]
 	detailsResume(tgl_rekam: String!): [DetailResume]
 }
 
