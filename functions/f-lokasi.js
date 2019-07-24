@@ -27,7 +27,7 @@ const monitorRekam = async root => {
 			if(!perekam) throw { msg: Error('Nama Perekam Tidak Cocok...') }
 			query = { perekam: perekam.id }
 		}
-		let lokasi = await LokasiModel.find(query, '-berkas').populate([{ path: 'perekam', select: 'status nama' }])
+		let lokasi = await LokasiModel.find(query, '-berkas').sort({ _id: -1 }).populate([{ path: 'perekam', select: 'status nama' }])
 		return lokasi.map(async l => {
 			l.created_at = dateFromObjectId(l.id)
 			l.jumlah_berkas = await BerkasModel.countDocuments({ lokasi: l.id })
