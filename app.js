@@ -142,6 +142,29 @@ app.post('/importlb', (req, res) => {
 	}
 })
 
+// Import WP
+app.post('/importwp', async (req, res) => {
+	try {
+		const file = req.files.file
+		let data = file.data.toString('utf-8').split('\n').map(d => d.split(/,|;/))
+		const headers = data[0]
+		const update = []
+		for(let i = 1; i < data.length; i++) update.push({
+			updateOne: {
+				filter: { [headers[0]]: data[i][0] },
+				update: { [headers[0]]: data[i][0], [headers[1]]: data[i][1] },
+				upsert: true
+			}
+		})
+		const WPModel = require('./models/m-wp')
+		const { matchedCount, insertedCount } = await WPModel.bulkWrite(update)
+		res.json({ matchedCount, insertedCount })
+	} catch (err) {
+		console.log(err)
+		res.status('405').json(err)
+	}
+})
+
 // Connect to MongoDB
 mongoose.connect('mongodb://localhost:27017/arsip', {
 	useNewUrlParser: true, 
