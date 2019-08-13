@@ -14,6 +14,7 @@ module.exports = `
 		lokasi: Lokasi
 		file: String
 		ket_lain: String
+		transaksi: Transaksi
 		created_at: String
 		updated_at: String
 	}

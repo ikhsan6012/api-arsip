@@ -7,6 +7,8 @@ ${require('./t-penerima')}
 ${require('./t-lokasi')}
 ${require('./t-lb')}
 ${require('./t-perekaman')}
+${require('./t-seksi')}
+${require('./t-transaksi')}
 
 type RootQuery{
 	users(nama: String, status: Int): [User]
@@ -26,6 +28,9 @@ type RootQuery{
 	resumeRekam: [ResumeRekam]
 	monitorRekam(tgl_rekam: String, perekam: String): [Lokasi]
 	detailsResume(tgl_rekam: String!): [DetailResume]
+	seksis(nama_seksi: String, populate: Boolean): [Seksi]
+	seksi(_id: ID, kode: String): Seksi
+	transaksis(populate: Boolean): [Transaksi]
 }
 
 type RootMutation{
@@ -42,6 +47,10 @@ type RootMutation{
 	deleteNDLB(id: ID!): LB
 	addTujuanLB(id: ID!, tujuan_nd: String!): LB
 	deleteTujuanLB(id: ID!, tujuan_nd: String!): LB
+	addSeksi(input: SeksiInput!): Seksi
+	addTransaksi(input: TransaksiInput!): Transaksi
+	editTransaksi(_id: ID, input: TransaksiInput!): Transaksi
+	deleteTransaksi(_id: ID!): Transaksi
 }
 
 schema {

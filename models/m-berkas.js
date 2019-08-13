@@ -48,7 +48,11 @@ const berkasSchema = new Schema({
 		type: String,
 		uppercase: true
 	},
-	file: String
+	file: String,
+	transaksi: {
+		type: Schema.Types.ObjectId,
+		ref: 'Transaksi'
+	}
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
 
 berkasSchema.pre('findOneAndUpdate', async function(next){

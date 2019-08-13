@@ -7,4 +7,6 @@ module.exports = {
 	...require('./r-lokasi'),
 	...require('./r-lb'),
 	...require('./r-perekaman'),
+	...require('./r-seksi'),
+	...require('./r-transaksi'),
 }
